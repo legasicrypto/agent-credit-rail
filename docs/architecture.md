@@ -4,9 +4,10 @@
 
 ```text
 Owner
-  -> funds collateral
+  -> posts collateral
+Legasi credit account
+  -> computes overcollateralized purchasing power from owner-posted assets
 Legasi orchestrator
-  -> computes purchasing power
   -> stores per-agent policy
 Agent client
   -> requests paid service
@@ -41,10 +42,16 @@ Owner
 - requests services
 - authorizes payment intents
 - does not control unrestricted treasury funds
+- spends only against a Legasi-managed credit account
+
+### Legasi credit account
+
+- turns owner-posted collateral into an overcollateralized credit line
+- computes available purchasing power from collateral value and LTV
+- tracks used and remaining power
 
 ### Legasi orchestrator
 
-- computes purchasing power
 - enforces policy
 - checks spend attempts
 - submits Stellar transactions
@@ -79,7 +86,7 @@ Owner
 
 ## Design principles
 
-- owner-funded purchasing power, not unrestricted agent wallets
+- owner-funded overcollateralized credit, not unrestricted agent wallets
 - one collateral asset in phase 1
 - one paid service in phase 1
 - off-chain policy, on-chain payment settlement

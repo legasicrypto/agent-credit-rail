@@ -28,6 +28,7 @@ This is a secondary but powerful product feature. It turns the system from a sil
 - a blocked request can create an owner-facing event
 - an unknown request can be represented as pending approval
 - owner decision updates policy or request state in a predictable way
+- the main approved-payment demo does not depend on notification delivery or approval UI
 
 ## Out of scope
 

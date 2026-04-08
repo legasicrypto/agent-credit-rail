@@ -12,6 +12,10 @@ Each file in `backlog/` is written as a ready-to-open GitHub issue with:
 - out-of-scope notes
 - implementation hints
 
+## Core conceptual doc
+
+- `CREDIT_MODEL.md` explains that the agent's purchasing power is an overcollateralized credit line derived from owner-posted collateral.
+
 ## Recommended opening order
 
 1. `000-epic-hackathon-mvp.md`

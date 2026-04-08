@@ -2,13 +2,13 @@
 
 ## Objective
 
-Deliver a working Stellar testnet MVP where an owner funds collateral, an agent receives policy-controlled purchasing power, an approved x402 service can be paid automatically, and unauthorized spend attempts are blocked and logged.
+Deliver a working Stellar testnet MVP where an owner funds collateral, an agent receives policy-controlled purchasing power from an overcollateralized credit line, an approved x402 service can be paid automatically, and unauthorized spend attempts are blocked and logged.
 
 ## Why this epic exists
 
 This epic is the implementation spine for the repository. It defines the smallest possible real product that proves the core statement:
 
-> Owners fund controlled purchasing power for agents, and Legasi settles only approved x402 payments on Stellar under per-agent policy rules.
+> Owners fund an overcollateralized credit line for agents, and Legasi settles only approved x402 payments on Stellar under per-agent policy rules.
 
 ## Scope
 

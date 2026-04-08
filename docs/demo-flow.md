@@ -4,13 +4,16 @@
 
 Show one complete story that judges can understand immediately:
 
-An owner funds controlled purchasing power for an agent, the agent tries to buy from an approved x402 service, Legasi approves and submits the payment on Stellar testnet, and the service returns the protected result.
+An owner funds an overcollateralized credit line for an agent, the agent tries to buy from an approved x402 service, Legasi approves and submits the payment on Stellar testnet, and the service returns the protected result.
 
 ## Primary demo sequence
 
 1. Show one owner and one agent.
 2. Show one collateral position posted by the owner.
-3. Show the agent's computed purchasing power.
+3. Show one concrete example:
+   - collateral value = 1,000 USD
+   - base LTV = 60%
+   - purchasing power = 600 USDC
 4. Show the agent's allowlisted service.
 5. Call the paid service.
 6. Show `402 Payment Required`.
@@ -31,11 +34,11 @@ An owner funds controlled purchasing power for an agent, the agent tries to buy 
 
 ### Opening
 
-"This is a company credit card model for agents. The owner posts collateral and defines where the agent is allowed to spend. The agent can buy approved services, but it does not control the treasury account."
+"This is a company credit card model for agents. The owner posts collateral, Legasi converts that collateral into an overcollateralized credit line, and the owner defines where the agent is allowed to spend. The agent can buy approved services, but it does not control the treasury account."
 
 ### Approved spend
 
-"Here the owner has funded collateral. Legasi has converted that into purchasing power. The agent requests a paid service. The service responds with 402 Payment Required. Legasi checks the policy and remaining headroom, the agent authorizes the payment intent, and Legasi submits the transaction on Stellar testnet. Once settlement succeeds, the service unlocks."
+"Here the owner has posted collateral worth 1,000 USD. With a 60% LTV, Legasi gives the agent 600 USDC of purchasing power. The agent requests a paid service. The service responds with 402 Payment Required. Legasi checks the policy and remaining headroom, the agent authorizes the payment intent, and Legasi submits the transaction on Stellar testnet. Once settlement succeeds, the service unlocks."
 
 ### Blocked spend
 

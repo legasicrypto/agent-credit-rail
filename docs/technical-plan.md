@@ -5,7 +5,8 @@
 Legasi's long-term direction is permissioned digital credit infrastructure. For the Stellar hackathon, the goal is not to ship the entire institutional Lombard stack. The goal is to prove the first and most important layer of that system on Stellar testnet:
 
 - an owner funds collateral
-- each agent receives policy-controlled purchasing power
+- Legasi converts that collateral into an overcollateralized credit line using a conservative LTV
+- each agent receives policy-controlled purchasing power against that credit line
 - payments happen through x402 on Stellar
 - the agent authorizes the payment
 - Legasi submits the transaction and pays fees
@@ -24,7 +25,7 @@ The core product analogy is a company credit card for agents:
 Build a working Stellar testnet demo where:
 
 1. an owner posts one collateral asset into Legasi infrastructure
-2. Legasi computes purchasing power from collateral value and conservative LTV
+2. Legasi computes an overcollateralized credit line from collateral value and conservative LTV
 3. an agent requests a paid x402 service
 4. the service returns `402 Payment Required`
 5. Legasi checks whitelist, denylist, per-request cap, daily cap, remaining power, and post-payment LTV
@@ -96,6 +97,8 @@ What should stay off-chain for the hackathon:
 
 Phase 1 should use one non-payment collateral asset and settle approved service payments in USDC terms.
 
+The key point is that the agent is spending against a **credit line**, not against a wallet balance.
+
 Formula:
 
 purchasing_power_usdc = collateral_usd_value × base_ltv
@@ -120,7 +123,7 @@ Responsibilities:
 
 - register owners and agents
 - store collateral positions
-- compute purchasing power
+- compute the credit line and remaining purchasing power
 - evaluate policy rules
 - request and validate agent authorization
 - rebuild and submit Stellar transactions
@@ -155,7 +158,7 @@ A payment is allowed only if the service is approved, the amount is within caps,
 
 1. Get one x402-protected route working on Stellar testnet.
 2. Implement one owner, one agent, one allowlisted service, and one blocked-service example.
-3. Implement one collateral asset, one USD valuation rule, one fixed LTV, and available power computation.
+3. Implement one collateral asset, one USD valuation rule, one fixed LTV, and credit-line / available-power computation.
 4. Implement agent authorization plus Legasi fee-payer submission.
 5. Implement payment logs and blocked-attempt logs.
 6. Prepare tx proof, screenshots, and demo video.
@@ -164,4 +167,4 @@ A payment is allowed only if the service is approved, the amount is within caps,
 
 The project is successful if it proves this statement end to end:
 
-Owners fund controlled purchasing power for agents, and Legasi settles only approved x402 payments on Stellar under per-agent policy rules.
+Owners fund an overcollateralized credit line for agents, and Legasi settles only approved x402 payments on Stellar under per-agent policy rules.

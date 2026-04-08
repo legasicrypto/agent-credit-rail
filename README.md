@@ -1,18 +1,34 @@
 # Agent Credit Rail
 
-Policy-controlled agent payments on Stellar, backed by owner-funded overcollateralized purchasing power.
+Policy-controlled agent payments on Stellar, backed by an **overcollateralized credit line** funded by owner-posted assets.
 
 ## What this project is
 
 This repository contains the hackathon implementation of the first layer of Legasi's agent credit infrastructure:
 
 - an **owner** posts collateral into Legasi infrastructure
-- each **agent** receives policy-controlled purchasing power derived from collateral value and LTV
+- Legasi converts that collateral into a **discounted credit line** using a conservative LTV
+- each **agent** receives policy-controlled purchasing power derived from that credit line
 - the agent can only pay approved x402 services
 - the agent authorizes the payment intent
 - **Legasi submits the payment on Stellar testnet** and pays fees
 - the paid service returns the protected result
 - Legasi updates usage, logs, and reputation
+
+## The key product point
+
+The agent's purchasing power is **not** a prepaid balance and it is **not** unrestricted cash.
+
+It is an **overcollateralized credit line** backed by collateral posted by the owner.
+
+That means:
+
+- the owner funds collateral
+- Legasi applies an LTV
+- the agent spends against a credit account
+- the agent never receives unrestricted borrowed funds in its own wallet
+
+See [CREDIT_MODEL.md](./CREDIT_MODEL.md).
 
 ## Core product analogy
 
@@ -38,8 +54,9 @@ Phase 1 intentionally stays small:
 ## Architecture summary
 
 ```text
-Owner funds collateral
-  -> Legasi computes purchasing power
+Owner posts collateral
+  -> Legasi computes an overcollateralized credit line using LTV
+  -> agent receives controlled purchasing power against that credit line
 Agent requests paid service
   -> service returns 402 Payment Required
 Legasi checks policy and remaining purchasing power
@@ -84,6 +101,7 @@ The backlog under [`backlog/`](./backlog) is the source of truth for implementat
 
 ## Key docs
 
+- [Credit model](./CREDIT_MODEL.md)
 - [Technical plan](./docs/technical-plan.md)
 - [Architecture](./docs/architecture.md)
 - [Demo flow](./docs/demo-flow.md)
@@ -105,4 +123,4 @@ This repo does **not** attempt to ship the full institutional Lombard lending st
 
 Build the smallest possible real system that proves this statement:
 
-> Owners fund controlled purchasing power for agents, and Legasi settles only approved x402 payments on Stellar under per-agent policy rules.
+> Owners fund an overcollateralized credit line for agents, and Legasi settles only approved x402 payments on Stellar under per-agent policy rules.

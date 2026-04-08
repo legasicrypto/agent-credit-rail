@@ -27,6 +27,8 @@ This is the key architectural choice that makes the system feel like a company c
 - the paid service unlocks after successful settlement
 - the system makes clear that the agent is the principal and Legasi is the submitter
 - the flow is reproducible on Stellar testnet
+- the only supported spend path in the MVP is: agent authorizes, Legasi submits
+- the agent does not self-submit direct treasury payments in the MVP
 
 ## Out of scope
 

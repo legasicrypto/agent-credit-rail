@@ -1,3 +1,3 @@
 # credit-engine
 
-Collateral valuation, LTV rules, purchasing power computation, and reputation-driven parameter adjustments.
+Owner-funded collateral valuation, LTV rules, overcollateralized credit-line computation, and reputation-driven parameter adjustments.
