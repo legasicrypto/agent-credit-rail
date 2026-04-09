@@ -7,6 +7,7 @@
     "build": "pnpm -r build",
     "dev:orchestrator": "pnpm --filter @agent-credit-rail/legasi-orchestrator dev",
     "dev:paywall": "pnpm --filter @agent-credit-rail/paywall-service dev",
+    "dev:ui": "pnpm --filter @agent-credit-rail/demo-ui dev",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
