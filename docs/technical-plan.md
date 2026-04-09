@@ -104,6 +104,13 @@ Formula:
 purchasing_power_usdc = collateral_usd_value × base_ltv
 available_power_usdc = purchasing_power_usdc - used_power_usdc
 
+Concrete phase-1 example:
+
+- owner-posted collateral value = 1,000 USD
+- base LTV = 60%
+- agent credit line = 600 USDC
+- if the agent spends 50 USDC on approved services, remaining available power = 550 USDC
+
 This preserves the overcollateralized credit thesis while staying small enough to ship.
 
 ## Main components
@@ -138,6 +145,7 @@ A CLI or MCP-style client that:
 - forwards the challenge to Legasi
 - signs the payment authorization
 - displays the result
+- never manages unrestricted treasury funds or direct treasury payments
 
 ## Policy model
 

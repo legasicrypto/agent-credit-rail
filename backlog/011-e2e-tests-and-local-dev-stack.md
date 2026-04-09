@@ -8,6 +8,8 @@ Create a repeatable local development and testing path for the main flows.
 
 The demo must be reproducible. The team also needs confidence that changes do not break the approved and blocked payment flows.
 
+The tests should validate not only payment success and failure, but also the **credit-backed behavior** of the system.
+
 ## Scope
 
 - local setup instructions
@@ -27,6 +29,9 @@ The demo must be reproducible. The team also needs confidence that changes do no
 
 - a new contributor can run the main flows locally using the runbook
 - approved and blocked paths are both covered by automated tests
+- approved payments reduce available credit headroom as expected
+- blocked payments leave available credit headroom unchanged
+- the tested flow does not include any direct agent treasury funding path
 - the tests are stable enough for repeated use during the hackathon
 
 ## Out of scope
