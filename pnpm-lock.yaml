@@ -76,6 +76,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.14.0
         version: 1.19.13(hono@4.12.12)
+      dotenv:
+        specifier: ^16.6.1
+        version: 16.6.1
       hono:
         specifier: ^4.7.1
         version: 4.12.12

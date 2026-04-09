@@ -13,6 +13,7 @@
     "@agent-credit-rail/shared-types": "workspace:*",
     "@agent-credit-rail/credit-engine": "workspace:*",
     "@hono/node-server": "^1.14.0",
+    "dotenv": "^16.6.1",
     "hono": "^4.7.1",
     "zod": "^3.24.2"
   },
