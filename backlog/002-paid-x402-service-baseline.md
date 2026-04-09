@@ -8,6 +8,8 @@ Implement one x402-protected service on Stellar testnet that returns `402 Paymen
 
 This is the first hard proof that the project is really built on Stellar and not just simulating payments off-chain.
 
+This service is the **merchant endpoint** in the Legasi credit flow. It should be built as a paid service that will later be consumed through the orchestrator-backed, owner-funded credit model, not as a standalone wallet-pay demo.
+
 ## Scope
 
 - choose one service route, e.g. `GET /search` or `GET /premium/compute`
@@ -25,6 +27,7 @@ This is the first hard proof that the project is really built on Stellar and not
 - a request with a valid payment succeeds
 - response payload is stable and demo-friendly
 - setup is documented
+- the service is documented as a merchant endpoint for the Legasi credit-backed orchestration flow
 
 ## Out of scope
 
