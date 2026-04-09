@@ -1,0 +1,26 @@
+{
+  "name": "@agent-credit-rail/paywall-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "echo 'no lint configured yet'"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.0",
+    "@x402/core": "^2.9.0",
+    "@x402/hono": "^2.9.0",
+    "@x402/stellar": "^2.9.0",
+    "@x402/extensions": "^2.9.0",
+    "dotenv": "^16.6.1",
+    "hono": "^4.7.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
+  }
+}
