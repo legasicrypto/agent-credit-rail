@@ -5,7 +5,8 @@
   "packageManager": "pnpm@10.0.0",
   "scripts": {
     "build": "pnpm -r build",
-    "dev": "echo 'Run each app individually while the scaffold is still being wired'",
+    "dev:orchestrator": "pnpm --filter @agent-credit-rail/legasi-orchestrator dev",
+    "dev:paywall": "pnpm --filter @agent-credit-rail/paywall-service dev",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
