@@ -15,7 +15,11 @@ export function evaluateServicePolicy(
   policy: PolicyRule,
   dailySpend: number,
 ): PolicyResult {
-  const rule = policy.services.find((s) => s.service_url === serviceUrl);
+  // Match by exact service_url or by URL path suffix.
+  // Policy stores paths like "/search", real requests use full URLs like "http://host/search".
+  const rule = policy.services.find(
+    (s) => s.service_url === serviceUrl || serviceUrl.endsWith(s.service_url),
+  );
 
   if (!rule) {
     return { decision: "blocked", reason: "NOT_ALLOWLISTED" };

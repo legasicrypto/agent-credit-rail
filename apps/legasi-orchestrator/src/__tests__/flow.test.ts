@@ -1,14 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { createSeededStore } from "../store.js";
 import { evaluatePaymentRequest } from "../decision.js";
-import { submitPayment, type StellarSubmitter } from "../submission.js";
+import { submitPayment, type PaymentSettler } from "../submission.js";
 
-const successSubmitter: StellarSubmitter = {
-  submit: async () => ({ tx_hash: "tx-stellar-abc123" }),
+const successSettler: PaymentSettler = {
+  settle: async () => ({ tx_hash: "tx-stellar-abc123", result: { data: "unlocked" } }),
 };
 
-const failureSubmitter: StellarSubmitter = {
-  submit: async () => {
+const failureSettler: PaymentSettler = {
+  settle: async () => {
     throw new Error("Stellar submission timeout");
   },
 };
@@ -25,14 +25,14 @@ describe("submission flow", () => {
     const response = await submitPayment(
       decision.attempt,
       store,
-      successSubmitter,
-      { results: ["data"] },
+      successSettler,
+      { some: "challenge" },
     );
 
     expect(response.status).toBe("settled");
     if (response.status === "settled") {
       expect(response.tx_hash).toBe("tx-stellar-abc123");
-      expect(response.result).toEqual({ results: ["data"] });
+      expect(response.result).toEqual({ data: "unlocked" });
     }
     expect(response.attempt_id).toBe(decision.attempt.attempt_id);
 
@@ -56,7 +56,7 @@ describe("submission flow", () => {
     const response = await submitPayment(
       decision.attempt,
       store,
-      failureSubmitter,
+      failureSettler,
       null,
     );
 
@@ -89,8 +89,8 @@ describe("submission flow", () => {
     const response = await submitPayment(
       decision.attempt,
       store,
-      successSubmitter,
-      { query: "test", results: ["r1"] },
+      successSettler,
+      { some: "challenge" },
     );
 
     // Verify terminal response

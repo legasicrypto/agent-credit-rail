@@ -27,6 +27,7 @@ export interface Fetcher {
     agent_id: string;
     service_url: string;
     amount_usdc: number;
+    payment_challenge?: unknown;
   }): Promise<OrchestrationResponse>;
 }
 
@@ -58,14 +59,15 @@ export class AgentClient {
 
     const challenge: PaywallChallenge = { status: 402, paymentRequired };
 
-    // 4. Extract price
+    // 4. Extract price (v2: accepts[].amount in atomic units, 7 decimals for USDC)
     const priceUsdc = extractPrice(paymentRequired);
 
-    // 5. Forward to orchestrator
+    // 5. Forward to orchestrator with full challenge
     const result = await this.fetcher.postOrchestrator({
       agent_id: this.config.agentId,
       service_url: serviceUrl,
       amount_usdc: priceUsdc,
+      payment_challenge: paymentRequired,
     });
 
     return {
@@ -77,11 +79,29 @@ export class AgentClient {
   }
 }
 
+/**
+ * Extract price from x402 v2 PaymentRequired.
+ * v2 uses accepts[].amount (string, atomic units with 7 decimals for Stellar USDC).
+ * Falls back to v1 maxAmountRequired for backward compat.
+ */
 function extractPrice(paymentRequired: unknown): number {
   if (!paymentRequired || typeof paymentRequired !== "object") return 0.001;
-  const pr = paymentRequired as { accepts?: Array<{ maxAmountRequired?: string }> };
-  if (pr.accepts?.[0]?.maxAmountRequired) {
-    return parseFloat(pr.accepts[0].maxAmountRequired) / 10_000_000;
+  const pr = paymentRequired as {
+    accepts?: Array<{ amount?: string; maxAmountRequired?: string }>;
+  };
+
+  const first = pr.accepts?.[0];
+  if (!first) return 0.001;
+
+  // v2: amount is in atomic units (7 decimals for Stellar USDC)
+  if (first.amount) {
+    return parseFloat(first.amount) / 10_000_000;
   }
+
+  // v1 fallback
+  if (first.maxAmountRequired) {
+    return parseFloat(first.maxAmountRequired) / 10_000_000;
+  }
+
   return 0.001;
 }

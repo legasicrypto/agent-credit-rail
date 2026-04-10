@@ -4,6 +4,8 @@ interface CreditAccount {
   agent_id: string;
   owner_id: string;
   collateral_value_usd: number;
+  collateral_asset: string;
+  collateral_amount: number;
   base_ltv: number;
   purchasing_power_usdc: number;
   used_power_usdc: number;
@@ -85,25 +87,30 @@ export function App() {
         Agent Credit Rail
       </h1>
       <p style={{ color: "#666" }}>
-        Policy-controlled agent payments on Stellar, backed by overcollateralized credit
+        Owner posts XLM collateral. Legasi computes a credit line. Agent spends USDC on approved services.
       </p>
 
       {/* Credit Account */}
       <section style={{ background: "#f5f5f5", padding: 16, borderRadius: 8, marginBottom: 16 }}>
         <h2 style={{ margin: "0 0 12px" }}>Credit Account</h2>
         {account ? (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <Stat label="Collateral (USD)" value={`$${account.collateral_value_usd}`} />
-            <Stat label="Base LTV" value={`${(account.base_ltv * 100).toFixed(0)}%`} />
-            <Stat label="Purchasing Power" value={`${account.purchasing_power_usdc} USDC`} />
-            <Stat label="Used Power" value={`${account.used_power_usdc} USDC`} />
-            <Stat
-              label="Available Power"
-              value={`${availablePower} USDC`}
-              highlight={availablePower < 100}
-            />
-            <Stat label="Agent" value={account.agent_id} />
-          </div>
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <Stat label="Collateral (posted by owner)" value={`${account.collateral_amount.toLocaleString()} ${account.collateral_asset} ($${account.collateral_value_usd})`} />
+              <Stat label="Base LTV" value={`${(account.base_ltv * 100).toFixed(0)}%`} />
+              <Stat label="Purchasing Power" value={`${account.purchasing_power_usdc} USDC`} />
+              <Stat label="Used Power" value={`${account.used_power_usdc} USDC`} />
+              <Stat
+                label="Available Power"
+                value={`${availablePower} USDC`}
+                highlight={availablePower < 100}
+              />
+              <Stat label="Agent" value={account.agent_id} />
+            </div>
+            <div style={{ marginTop: 8, fontSize: 12, color: "#888" }}>
+              Payments settle in USDC on Stellar testnet
+            </div>
+          </>
         ) : (
           <p>Loading... (is the orchestrator running on :4010?)</p>
         )}
@@ -175,7 +182,16 @@ export function App() {
                   <td style={{ padding: "6px 4px" }}>{evt.service_url}</td>
                   <td style={{ padding: "6px 4px" }}>{evt.amount_usdc} USDC</td>
                   <td style={{ padding: "6px 4px", fontSize: 12, color: "#666" }}>
-                    {evt.kind === "settled" && evt.tx_hash}
+                    {evt.kind === "settled" && evt.tx_hash && (
+                      <a
+                        href={`https://stellar.expert/explorer/testnet/tx/${evt.tx_hash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: "#2b6cb0" }}
+                      >
+                        {evt.tx_hash.slice(0, 12)}...
+                      </a>
+                    )}
                     {evt.kind === "blocked" && evt.reason}
                     {evt.kind === "failed" && evt.error}
                   </td>

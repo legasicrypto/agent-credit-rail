@@ -16,7 +16,8 @@ const app = createPaywallApp({
   stellarPayeeAddress: STELLAR_PAYEE_ADDRESS,
   stellarNetwork: (process.env.STELLAR_NETWORK || "stellar:testnet") as `${string}:${string}`,
   facilitatorUrl: process.env.FACILITATOR_URL || "https://x402.org/facilitator",
-  price: process.env.PAYWALL_PRICE || "$0.001",
+  // Default: 0.001 XLM via wrapped XLM SAC (friendbot-funded accounts work immediately)
+  price: process.env.PAYWALL_PRICE || undefined,
 });
 
 serve({ fetch: app.fetch, port: PORT }, () => {

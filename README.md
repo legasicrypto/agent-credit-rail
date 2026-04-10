@@ -6,10 +6,21 @@ Policy-controlled agent payments on Stellar, backed by an **overcollateralized c
 
 ## What this proves
 
-An AI agent requests a paid HTTP service. The service returns `402 Payment Required` with an x402 challenge on Stellar testnet. Legasi checks the agent's policy and remaining credit, then submits the payment on Stellar. The agent never receives unrestricted funds — it spends against an overcollateralized credit line.
+An AI agent requests a paid HTTP service. The service returns `402 Payment Required` with an x402 challenge on Stellar testnet. Legasi checks the agent's policy and remaining credit, then settles the USDC payment on Stellar. The agent never receives unrestricted funds — it spends against an overcollateralized credit line backed by XLM collateral.
+
+**Canonical proof (Stellar testnet):**
+
+| | |
+|---|---|
+| **Tx hash** | `c95f226755d775a1b97dcc38fbb12d38fe6fee2f9e3f50074b78f382b377fa77` |
+| **Explorer** | [View on Stellar Expert](https://stellar.expert/explorer/testnet/tx/c95f226755d775a1b97dcc38fbb12d38fe6fee2f9e3f50074b78f382b377fa77) |
+| **Collateral** | XLM (owner-posted, valued in USD) |
+| **Payment asset** | USDC (Stellar testnet SAC) |
+
+**Why this is not just another x402 demo:** The owner's collateral (XLM) is not the payment asset (USDC). Legasi computes a credit line from collateral, applies policy controls, and settles payments on a separate rail. The service unlocks only after real Stellar settlement. This is the first working layer of credit infrastructure for AI agents — not a wallet, not a proxy, but a controlled spend rail backed by overcollateralized credit.
 
 **Two demo flows:**
-1. **Approved**: agent requests allowlisted `/search` → 402 → policy + credit check passes → Legasi submits Stellar tx → service returns result → spend logged
+1. **Approved**: agent requests allowlisted `/search` → 402 → policy + credit check passes → Legasi settles USDC payment on Stellar → service returns result → spend logged
 2. **Blocked**: agent requests `unknown-api.xyz` (synthetic) → policy rejects → blocked event logged → power unchanged
 
 ## The credit model
@@ -21,9 +32,10 @@ purchasing_power = collateral_value_usd × base_ltv
 available_power  = purchasing_power - used_power
 ```
 
-- Owner posts **collateral** (1000 USD in demo)
+- Owner posts **XLM collateral** (10,000 XLM valued at $1,000 in demo)
 - Legasi applies **LTV** (0.6 = conservative discount)
 - Agent gets **600 USDC purchasing power** (credit line, not cash)
+- Payments settle in **USDC on Stellar** — a different asset from the collateral
 - Each settled payment increases `used_power`
 - Blocked/failed payments never affect `used_power`
 
@@ -70,9 +82,11 @@ curl -i http://localhost:4020/search
 
 | Parameter | Value |
 |-----------|-------|
-| Owner collateral | 1000 USD |
+| Collateral asset | XLM (10,000 XLM) |
+| Collateral valuation | $1,000 USD |
 | Base LTV | 0.6 |
 | Purchasing power | 600 USDC |
+| Payment asset | USDC (Stellar testnet) |
 | Allowlisted service | `/search` (cap: 100/request, 500/day) |
 | Blocked service | `unknown-api.xyz` (synthetic, not a real service) |
 
@@ -80,11 +94,12 @@ curl -i http://localhost:4020/search
 
 | Component | Status |
 |-----------|--------|
-| x402 paywall (402 challenge) | **Real** — `@x402/hono` + `@x402/stellar` on Stellar testnet |
+| x402 paywall (402 challenge) | **Real** — `@x402/hono` + `@x402/stellar`, USDC on Stellar testnet |
+| x402 USDC settlement | **Real** — end-to-end on Stellar testnet ([proof tx](https://stellar.expert/explorer/testnet/tx/c95f226755d775a1b97dcc38fbb12d38fe6fee2f9e3f50074b78f382b377fa77)) |
 | Policy engine | **Real** — allowlist/denylist, per-request + daily caps |
-| Credit engine | **Real** — overcollateralized credit line math with drift guards |
+| Credit engine | **Real** — overcollateralized credit line (XLM collateral → USDC purchasing power) |
 | Decision engine | **Real** — combines policy + credit, creates attempts + events |
-| Stellar submission | **Mocked** in local dev, real in `smoke:testnet` |
+| Stellar submission | **Mocked** in local dev, **real** in smoke tests + demo |
 | Storage | **In-memory** Maps with seeded demo data |
 
 ## Architecture

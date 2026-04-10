@@ -2,15 +2,16 @@ import { describe, it, expect } from "vitest";
 import { AgentClient, type Fetcher } from "../index.js";
 import type { OrchestrationResponse } from "@agent-credit-rail/shared-types";
 
-// Mock paywall that always returns 402 with a Stellar challenge
+// Mock paywall that always returns 402 with a Stellar x402 v2 challenge
 function make402Response(): Response {
   const challenge = {
+    x402Version: 2,
     accepts: [
       {
         payTo: "GBZXN7PIRZGNMHGA7MUUUF4GWPY5AYPV6LY4UV2GL6VJGIQRXFDNMADI",
         scheme: "exact",
         network: "stellar:testnet",
-        maxAmountRequired: "10000",
+        amount: "10000", // v2: atomic units (7 decimals), = $0.001
       },
     ],
   };
@@ -41,7 +42,9 @@ describe("AgentClient", () => {
       fetchService: async () => make402Response(),
       postOrchestrator: async (body) => {
         expect(body.agent_id).toBe("agent-1");
-        expect(body.amount_usdc).toBeGreaterThan(0);
+        expect(body.amount_usdc).toBeCloseTo(0.001);
+        expect(body.payment_challenge).toBeDefined();
+        expect((body.payment_challenge as { x402Version: number }).x402Version).toBe(2);
         return settledResponse;
       },
     };

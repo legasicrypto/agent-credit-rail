@@ -7,13 +7,18 @@ export interface PaywallConfig {
   stellarPayeeAddress: string;
   stellarNetwork?: `${string}:${string}`;
   facilitatorUrl?: string;
-  price?: string;
+  price?: string | { amount: string; asset: string; extra?: Record<string, unknown> };
 }
+
+/** USDC on Stellar testnet (SAC for USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5). */
+export const USDC_TESTNET_ASSET = "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA";
 
 const defaults = {
   stellarNetwork: "stellar:testnet" as `${string}:${string}`,
   facilitatorUrl: "https://x402.org/facilitator",
-  price: "$0.001",
+  price: { amount: "10000", asset: USDC_TESTNET_ASSET } as
+    | string
+    | { amount: string; asset: string },
 };
 
 export function createPaywallApp(config: PaywallConfig) {

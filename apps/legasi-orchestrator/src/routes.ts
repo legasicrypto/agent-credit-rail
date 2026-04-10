@@ -4,9 +4,9 @@ import type { AgentCreditAccount } from "@agent-credit-rail/shared-types";
 import { computePurchasingPower } from "@agent-credit-rail/credit-engine";
 import type { Store } from "./store.js";
 import { evaluatePaymentRequest } from "./decision.js";
-import { submitPayment, type StellarSubmitter } from "./submission.js";
+import { submitPayment, type PaymentSettler } from "./submission.js";
 
-export function createOrchestratorApp(store: Store, submitter: StellarSubmitter) {
+export function createOrchestratorApp(store: Store, settler: PaymentSettler) {
   const app = new Hono();
 
   app.get("/health", (c) => c.json({ status: "ok" }));
@@ -22,7 +22,7 @@ export function createOrchestratorApp(store: Store, submitter: StellarSubmitter)
       return c.json({ error: "Invalid request", details: parsed.error.issues }, 400);
     }
 
-    const { agent_id, service_url, amount_usdc } = parsed.data;
+    const { agent_id, service_url, amount_usdc, payment_challenge } = parsed.data;
 
     const decision = evaluatePaymentRequest(
       { agent_id, service_url, amount_usdc },
@@ -40,16 +40,12 @@ export function createOrchestratorApp(store: Store, submitter: StellarSubmitter)
       );
     }
 
-    // Approved — submit to Stellar
-    // In a real flow, the protected result comes from the paywall service after settlement.
-    // For now, we use a placeholder that will be replaced in the full integration.
-    const protectedResult = { note: "Payment settled, service result pending integration" };
-
+    // Approved — settle via x402 (real) or mock
     const response = await submitPayment(
       decision.attempt,
       store,
-      submitter,
-      protectedResult,
+      settler,
+      payment_challenge,
     );
 
     const status = response.status === "settled" ? 200 : 502;
@@ -83,7 +79,11 @@ export function createOrchestratorApp(store: Store, submitter: StellarSubmitter)
       used_power_usdc: usedPower,
     };
 
-    return c.json(account);
+    return c.json({
+      ...account,
+      collateral_asset: collateral.asset,
+      collateral_amount: collateral.amount,
+    });
   });
 
   /**

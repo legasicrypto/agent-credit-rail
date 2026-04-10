@@ -10,6 +10,7 @@
     "dev:ui": "pnpm --filter @agent-credit-rail/demo-ui dev",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
+    "smoke:testnet": "pnpm --filter @agent-credit-rail/legasi-orchestrator exec vitest run src/__tests__/smoke.test.ts",
     "typecheck": "pnpm -r typecheck",
     "format": "prettier --write ."
   },

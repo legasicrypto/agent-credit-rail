@@ -142,6 +142,7 @@ export const PaymentRequestSchema = z.object({
   agent_id: z.string().min(1),
   service_url: z.string().min(1),
   amount_usdc: z.number().positive(),
+  payment_challenge: z.unknown().optional(),
 });
 
 export type PaymentRequestBody = z.infer<typeof PaymentRequestSchema>;

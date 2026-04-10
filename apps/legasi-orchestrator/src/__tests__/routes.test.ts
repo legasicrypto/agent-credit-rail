@@ -1,15 +1,15 @@
 import { describe, it, expect } from "vitest";
 import { createSeededStore } from "../store.js";
 import { createOrchestratorApp } from "../routes.js";
-import type { StellarSubmitter } from "../submission.js";
+import type { PaymentSettler } from "../submission.js";
 
-const mockSubmitter: StellarSubmitter = {
-  submit: async () => ({ tx_hash: "tx-mock-123" }),
+const mockSettler: PaymentSettler = {
+  settle: async () => ({ tx_hash: "tx-mock-123", result: { data: "mock-content" } }),
 };
 
 function makeApp() {
   const store = createSeededStore();
-  const app = createOrchestratorApp(store, mockSubmitter);
+  const app = createOrchestratorApp(store, mockSettler);
   return { app, store };
 }
 

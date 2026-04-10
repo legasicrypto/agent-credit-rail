@@ -118,8 +118,8 @@ export function createSeededStore(): Store {
   store.createAgent({ id: "agent-1", owner_id: "owner-1", name: "Demo Agent" });
   store.createCollateralPosition({
     owner_id: "owner-1",
-    asset: "USDC",
-    amount: 1000,
+    asset: "XLM",
+    amount: 10000,
     value_usd: 1000,
   });
   store.createPolicy({

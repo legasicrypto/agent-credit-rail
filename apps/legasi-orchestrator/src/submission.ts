@@ -1,23 +1,37 @@
 import type { PaymentAttempt, OrchestrationResponse } from "@agent-credit-rail/shared-types";
 import type { Store } from "./store.js";
 
-export interface StellarSubmitter {
-  submit(attempt: PaymentAttempt): Promise<{ tx_hash: string }>;
+/**
+ * PaymentSettler handles the x402 payment flow:
+ * builds payment payload, retries the service request with payment proof,
+ * and returns the tx_hash + unlocked content.
+ *
+ * The mock implementation skips the real flow.
+ * The real implementation uses @x402/stellar client + facilitator.
+ */
+export interface PaymentSettler {
+  settle(
+    serviceUrl: string,
+    paymentChallenge: unknown,
+  ): Promise<{ tx_hash: string; result: unknown }>;
 }
 
 /**
- * Submits a payment to Stellar and records the terminal event.
+ * Settles a payment and records the terminal event.
  * On success: used_power increases via settled event.
  * On failure: used_power unchanged, failed event recorded.
  */
 export async function submitPayment(
   attempt: PaymentAttempt,
   store: Store,
-  submitter: StellarSubmitter,
-  protectedResult: unknown,
+  settler: PaymentSettler,
+  paymentChallenge: unknown,
 ): Promise<OrchestrationResponse> {
   try {
-    const { tx_hash } = await submitter.submit(attempt);
+    const { tx_hash, result } = await settler.settle(
+      attempt.service_url,
+      paymentChallenge,
+    );
 
     store.recordEvent({
       kind: "settled",
@@ -33,7 +47,7 @@ export async function submitPayment(
       status: "settled",
       attempt_id: attempt.attempt_id,
       tx_hash,
-      result: protectedResult,
+      result,
     };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);

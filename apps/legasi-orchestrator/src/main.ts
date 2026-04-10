@@ -2,22 +2,32 @@ import { serve } from "@hono/node-server";
 import dotenv from "dotenv";
 import { createSeededStore } from "./store.js";
 import { createOrchestratorApp } from "./routes.js";
-import type { StellarSubmitter } from "./submission.js";
+import type { PaymentSettler } from "./submission.js";
+import { createX402Settler } from "./x402-settler.js";
 
 dotenv.config();
 
 const PORT = parseInt(process.env.ORCHESTRATOR_PORT || "4010", 10);
 
-// Phase 1: mock submitter for local dev. Real Stellar submitter in smoke tests.
-const mockSubmitter: StellarSubmitter = {
-  submit: async (attempt) => {
-    console.log(`[mock] Submitting payment for ${attempt.amount_usdc} USDC → ${attempt.service_url}`);
-    return { tx_hash: `mock-tx-${Date.now()}` };
-  },
-};
+function createSettler(): PaymentSettler {
+  const secretKey = process.env.STELLAR_TESTNET_SECRET_KEY;
+  if (secretKey) {
+    console.log("[stellar] Using real x402 settler (testnet)");
+    return createX402Settler(secretKey);
+  }
+
+  console.log("[mock] No STELLAR_TESTNET_SECRET_KEY — using mock settler");
+  return {
+    settle: async (_serviceUrl, _challenge) => ({
+      tx_hash: `mock-tx-${Date.now()}`,
+      result: { note: "Mock settlement — set STELLAR_TESTNET_SECRET_KEY for real Stellar" },
+    }),
+  };
+}
 
 const store = createSeededStore();
-const app = createOrchestratorApp(store, mockSubmitter);
+const settler = createSettler();
+const app = createOrchestratorApp(store, settler);
 
 serve({ fetch: app.fetch, port: PORT }, () => {
   console.log(`Legasi Orchestrator running on http://localhost:${PORT}`);
@@ -26,5 +36,5 @@ serve({ fetch: app.fetch, port: PORT }, () => {
   console.log(`  GET  /payments/:agentId → payment history`);
   console.log(`  GET  /health           → 200`);
   console.log();
-  console.log(`Seeded: owner=1000 USD, LTV=0.6, power=600 USDC, agent=agent-1`);
+  console.log(`Seeded: owner=10000 XLM ($1000 USD), LTV=0.6, power=600 USDC, agent=agent-1`);
 });
