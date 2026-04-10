@@ -2,7 +2,7 @@ import { serve } from "@hono/node-server";
 import dotenv from "dotenv";
 import { createPaywallApp } from "./server.js";
 
-dotenv.config();
+dotenv.config({ path: new URL("../../../.env", import.meta.url).pathname });
 
 const PORT = parseInt(process.env.PAYWALL_PORT || "4020", 10);
 const STELLAR_PAYEE_ADDRESS = process.env.STELLAR_PAYEE_ADDRESS;

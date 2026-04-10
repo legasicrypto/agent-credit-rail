@@ -5,7 +5,7 @@ import { createOrchestratorApp } from "./routes.js";
 import type { PaymentSettler } from "./submission.js";
 import { createX402Settler } from "./x402-settler.js";
 
-dotenv.config();
+dotenv.config({ path: new URL("../../../.env", import.meta.url).pathname });
 
 const PORT = parseInt(process.env.ORCHESTRATOR_PORT || "4010", 10);
 

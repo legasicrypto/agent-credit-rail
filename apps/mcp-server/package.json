@@ -1,0 +1,23 @@
+{
+  "name": "@agent-credit-rail/mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/main.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "echo 'no lint configured yet'"
+  },
+  "dependencies": {
+    "@agent-credit-rail/shared-types": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "dotenv": "^16.6.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
+  }
+}
