@@ -10,52 +10,27 @@ Agent Credit Rail lets AI agents spend against an overcollateralized credit line
 | Orchestrator API | https://legasi-orchestrator-production.up.railway.app/health |
 | Paywall (402) | https://legasi-paywall-production.up.railway.app/search |
 
-## Setup (2 minutes)
-
-### 1. Clone and install
-
-```bash
-git clone https://github.com/legasicrypto/agent-credit-rail.git
-cd agent-credit-rail
-pnpm install
-```
-
-### 2. Configure Claude Desktop
+## Setup (1 minute)
 
 Open your Claude Desktop config file:
 
 - **Mac**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
-Copy-paste this into the file. The only thing to change is `PATH_TO_REPO` on the two lines marked below:
+Copy-paste this — nothing to change:
 
 ```json
 {
   "mcpServers": {
     "legasi-credit-rail": {
       "command": "npx",
-      "args": ["tsx", "apps/mcp-server/src/main.ts"],
-      "cwd": "PATH_TO_REPO"
+      "args": ["-y", "legasi-credit-rail"]
     }
   }
 }
 ```
 
-Replace `PATH_TO_REPO` with the output of:
-
-```bash
-# Mac / Linux
-pwd
-
-# Windows
-cd
-```
-
-For example: `/Users/yourname/agent-credit-rail` or `C:\Users\yourname\agent-credit-rail`.
-
-### 3. Restart Claude Desktop
-
-Quit (Cmd+Q / Alt+F4) and relaunch. You should see the hammer icon (🔨) with 5 tools available.
+Restart Claude Desktop (Cmd+Q / Alt+F4, then relaunch). You should see the hammer icon (🔨) with 5 tools available.
 
 ## Demo script
 

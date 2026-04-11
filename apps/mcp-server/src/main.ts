@@ -1,10 +1,7 @@
+#!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import dotenv from "dotenv";
-
-dotenv.config({ path: new URL("../../../.env", import.meta.url).pathname });
-
 // Inlined from @agent-credit-rail/shared-types to keep MCP server standalone
 type OrchestrationResponse =
   | { status: "settled"; attempt_id: string; tx_hash: string; result: unknown }
