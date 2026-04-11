@@ -203,4 +203,74 @@ describe("orchestrator routes", () => {
     expect(getBody.policy.services).toHaveLength(1);
     expect(getBody.policy.services[0].service_url).toBe("/fresh");
   });
+
+  // ── POST /provision ──
+
+  it("POST /provision creates owner, agent, collateral, and policy", async () => {
+    const { app } = makeApp();
+    const res = await app.request("/provision", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ display_name: "Alice" }),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.owner_id).toMatch(/^owner-alice-/);
+    expect(body.agent_id).toMatch(/^claude-alice-/);
+    expect(body.agent_name).toBe("Alice's Claude");
+    expect(body.policy.services).toHaveLength(2);
+    expect(body.dashboard_url).toContain(`?agentId=${body.agent_id}`);
+  });
+
+  it("POST /provision defaults display_name to Judge", async () => {
+    const { app } = makeApp();
+    const res = await app.request("/provision", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.owner_name).toBe("Judge");
+    expect(body.agent_name).toBe("Judge's Claude");
+  });
+
+  it("provisioned agent can make payments", async () => {
+    const { app } = makeApp();
+    const provRes = await app.request("/provision", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ display_name: "Bob" }),
+    });
+    const { agent_id } = await provRes.json();
+
+    const payRes = await app.request("/payment/request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        agent_id,
+        service_url: "/search",
+        amount_usdc: 10,
+      }),
+    });
+    expect(payRes.status).toBe(200);
+    const payBody = await payRes.json();
+    expect(payBody.status).toBe("settled");
+  });
+
+  it("provisioned agent appears in GET /account/:agentId", async () => {
+    const { app } = makeApp();
+    const provRes = await app.request("/provision", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ display_name: "Carol" }),
+    });
+    const { agent_id } = await provRes.json();
+
+    const accRes = await app.request(`/account/${agent_id}`);
+    expect(accRes.status).toBe(200);
+    const acc = await accRes.json();
+    expect(acc.purchasing_power_usdc).toBe(600);
+    expect(acc.used_power_usdc).toBe(0);
+  });
 });

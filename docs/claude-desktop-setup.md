@@ -45,27 +45,36 @@ Replace `<path-to-repo>` with the full path to the cloned repository.
 
 ### 3. Restart Claude Desktop
 
-Quit (Cmd+Q / Alt+F4) and relaunch. You should see the hammer icon with 4 tools available.
+Quit (Cmd+Q / Alt+F4) and relaunch. You should see the hammer icon with tools available.
 
 ## Example prompts
 
 Try these in order:
 
-**1. Discover agents**
-> List the available demo agents and summarize their policies.
+**1. Set up your Legasi profile**
+> Set up Legasi for this Claude session. My name is [your name].
 
-**2. Read a premium article (approved flow)**
-> Use agent-1 to read the premium article from the paywalled service.
+This provisions a fresh agent with a 600 USDC credit line backed by demo collateral. You'll receive a personal dashboard link.
 
-**3. Try a different agent (different policy)**
-> Try the same request with agent-2 and explain whether policy allows or blocks it.
+**2. Check your policy**
+> Show my policy.
 
-**4. Check payment history**
-> Show the recent payment history for agent-1.
+**3. Read a premium article (approved flow)**
+> Read the premium article.
+
+Watch the payment settle in real time on Stellar testnet. Click the explorer link to verify.
+
+**4. Check your payment history**
+> Show my payment history.
+
+**5. Test policy enforcement**
+> Go to my dashboard and block `/search`, then try reading the article again.
+
+Open your dashboard link, click Edit on Policy Rules, toggle `/search` to DENIED, save. Then ask Claude to read the article again — it will be blocked.
 
 ## What to observe
 
-After each prompt, open the [dashboard](https://legasi-dashboard.fly.dev) and watch:
+After each prompt, open your personal dashboard link and watch:
 
 - **Payment History** — new settled (green) or blocked (red) events appear
 - **Policy Rules** — caps and daily spend update in real time
@@ -80,4 +89,4 @@ Claude Desktop → MCP tool → Paywall (402) → Legasi Orchestrator → Stella
                                             Policy check + Credit check
 ```
 
-The agent never touches funds. Legasi settles on its behalf, against an overcollateralized credit line backed by the owner's XLM collateral.
+The agent never touches funds. Legasi settles on its behalf, against an overcollateralized credit line backed by the owner's XLM collateral. Each Claude Desktop session gets its own agent identity, policy, and payment history.

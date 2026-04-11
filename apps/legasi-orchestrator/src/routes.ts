@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { PaymentRequestSchema, PolicyUpdateSchema } from "@agent-credit-rail/shared-types";
+import { PaymentRequestSchema, PolicyUpdateSchema, ProvisionRequestSchema } from "@agent-credit-rail/shared-types";
 import type { AgentCreditAccount } from "@agent-credit-rail/shared-types";
 import { computePurchasingPower } from "@agent-credit-rail/credit-engine";
 import type { Store } from "./store.js";
@@ -13,6 +13,49 @@ export function createOrchestratorApp(store: Store, settler: PaymentSettler) {
   app.use("*", cors());
 
   app.get("/health", (c) => c.json({ status: "ok" }));
+
+  /**
+   * POST /provision → create a fresh owner + agent + collateral + default policy
+   */
+  app.post("/provision", async (c) => {
+    const raw = await c.req.json().catch(() => ({}));
+    const parsed = ProvisionRequestSchema.safeParse(raw);
+    const displayName = parsed.success ? (parsed.data.display_name || "Judge") : "Judge";
+
+    const suffix = Math.random().toString(16).slice(2, 6);
+    const slug = displayName.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const ownerId = `owner-${slug}-${suffix}`;
+    const agentId = `claude-${slug}-${suffix}`;
+
+    store.createOwner({ id: ownerId, name: displayName });
+    store.createAgent({ id: agentId, owner_id: ownerId, name: `${displayName}'s Claude` });
+    store.createCollateralPosition({
+      owner_id: ownerId,
+      asset: "XLM",
+      amount: 10000,
+      value_usd: 1000,
+    });
+
+    const policy = {
+      agent_id: agentId,
+      services: [
+        { service_url: "/search", allowed: true, per_request_cap_usdc: 100, daily_cap_usdc: 500 },
+        { service_url: "unknown-api.xyz", allowed: false, per_request_cap_usdc: 0, daily_cap_usdc: 0 },
+      ],
+    };
+    store.createPolicy(policy);
+
+    const dashboardBase = process.env.DASHBOARD_URL || "https://legasi-dashboard.fly.dev";
+
+    return c.json({
+      owner_id: ownerId,
+      owner_name: displayName,
+      agent_id: agentId,
+      agent_name: `${displayName}'s Claude`,
+      policy,
+      dashboard_url: `${dashboardBase}?agentId=${agentId}`,
+    });
+  });
 
   /**
    * POST /payment/request → terminal OrchestrationResponse

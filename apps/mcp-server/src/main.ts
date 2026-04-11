@@ -10,39 +10,62 @@ const ORCHESTRATOR_URL =
   process.env.ORCHESTRATOR_URL || "https://legasi-orchestrator.fly.dev";
 const PAYWALL_URL =
   process.env.PAYWALL_URL || "https://legasi-paywall.fly.dev";
+const DASHBOARD_URL =
+  process.env.DASHBOARD_URL || "https://legasi-dashboard.fly.dev";
+
+// ── Session state ──
+
+let sessionAgentId: string | null = null;
+let sessionAgentName: string | null = null;
+let sessionDashboardUrl: string | null = null;
+
+interface ProvisionResult {
+  agent_id: string;
+  agent_name: string;
+  dashboard_url: string;
+}
+
+async function ensureProvisioned(displayName?: string): Promise<ProvisionResult> {
+  if (sessionAgentId && sessionAgentName && sessionDashboardUrl) {
+    return { agent_id: sessionAgentId, agent_name: sessionAgentName, dashboard_url: sessionDashboardUrl };
+  }
+
+  const res = await fetch(`${ORCHESTRATOR_URL}/provision`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ display_name: displayName }),
+  });
+  if (!res.ok) throw new Error(`Provisioning failed: ${res.status}`);
+  const data = await res.json();
+
+  sessionAgentId = data.agent_id;
+  sessionAgentName = data.agent_name;
+  sessionDashboardUrl = data.dashboard_url;
+
+  return { agent_id: data.agent_id, agent_name: data.agent_name, dashboard_url: data.dashboard_url };
+}
 
 const server = new McpServer({
   name: "legasi-credit-rail",
-  version: "0.1.0",
+  version: "0.2.0",
 });
 
-// ── Tool 1: list_agents ──
+// ── Tool 1: setup_legasi ──
 
 server.tool(
-  "list_agents",
-  "List all demo agents and their owner. Returns agent IDs, names, and which owner they belong to.",
-  {},
-  async () => {
+  "setup_legasi",
+  "Set up a Legasi spending profile for this Claude session. Provisions a fresh agent with a credit line backed by demo collateral. Call this explicitly, or it happens automatically on first use of any other tool.",
+  {
+    display_name: z.string().optional().describe("Your name (e.g. 'Alice'). Defaults to 'Judge' if not provided."),
+  },
+  async ({ display_name }) => {
     try {
-      // Get agent-1 account to find the owner
-      const accRes = await fetch(`${ORCHESTRATOR_URL}/account/agent-1`);
-      if (!accRes.ok) throw new Error(`API error: ${accRes.status}`);
-      const acc = await accRes.json();
-
-      const agentsRes = await fetch(`${ORCHESTRATOR_URL}/agents/${acc.owner_id}`);
-      if (!agentsRes.ok) throw new Error(`API error: ${agentsRes.status}`);
-      const { agents } = await agentsRes.json();
-
-      const lines = agents.map(
-        (a: { id: string; name: string; owner_id: string }) =>
-          `- ${a.name} (${a.id}) — owner: ${a.owner_id}`,
-      );
-
+      const profile = await ensureProvisioned(display_name);
       return {
         content: [
           {
             type: "text" as const,
-            text: `Available agents:\n${lines.join("\n")}\n\nUse get_policy to see what each agent is allowed to do.`,
+            text: `Legasi profile provisioned for this session.\n\nAgent: ${profile.agent_name} (${profile.agent_id})\nCredit line: 600 USDC (backed by 10,000 XLM demo collateral)\nDashboard: ${profile.dashboard_url}\n\nYou can now read premium articles, check your policy, or view payment history.`,
           },
         ],
       };
@@ -55,23 +78,22 @@ server.tool(
   },
 );
 
-// ── Tool 2: get_policy ──
+// ── Tool 2: show_my_policy ──
 
 server.tool(
-  "get_policy",
-  "Get the policy rules for an agent — which services are allowed or denied, per-request and daily caps.",
-  {
-    agent_id: z.string().describe("The agent ID (e.g. agent-1, agent-2)"),
-  },
-  async ({ agent_id }) => {
+  "show_my_policy",
+  "Show the policy rules for your Legasi agent — which services are allowed or denied, per-request and daily caps.",
+  {},
+  async () => {
     try {
-      const polRes = await fetch(`${ORCHESTRATOR_URL}/policy/${agent_id}`);
-      if (!polRes.ok) throw new Error(`Agent not found: ${agent_id}`);
+      const profile = await ensureProvisioned();
+      const polRes = await fetch(`${ORCHESTRATOR_URL}/policy/${profile.agent_id}`);
+      if (!polRes.ok) throw new Error(`API error: ${polRes.status}`);
       const { policy } = await polRes.json();
 
       if (!policy?.services?.length) {
         return {
-          content: [{ type: "text" as const, text: `No policy rules defined for ${agent_id}.` }],
+          content: [{ type: "text" as const, text: `No policy rules defined for ${profile.agent_name}.` }],
         };
       }
 
@@ -84,7 +106,7 @@ server.tool(
         content: [
           {
             type: "text" as const,
-            text: `Policy for ${agent_id}:\n${lines.join("\n")}`,
+            text: `Policy for ${profile.agent_name}:\n${lines.join("\n")}\n\nDashboard: ${profile.dashboard_url}`,
           },
         ],
       };
@@ -101,12 +123,12 @@ server.tool(
 
 server.tool(
   "read_premium_article",
-  "Read a premium article behind the Legasi paywall. The agent pays via its credit line — policy and credit are checked automatically. Payment settles in USDC on Stellar testnet.",
-  {
-    agent_id: z.string().describe("The agent ID to use for payment (e.g. agent-1, agent-2)"),
-  },
-  async ({ agent_id }) => {
+  "Read a premium article behind the Legasi paywall. Your agent pays via its credit line — policy and credit are checked automatically. Payment settles in USDC on Stellar testnet.",
+  {},
+  async () => {
     try {
+      const profile = await ensureProvisioned();
+
       // 1. Hit the paywall
       const serviceRes = await fetch(`${PAYWALL_URL}/search`);
 
@@ -131,7 +153,7 @@ server.tool(
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          agent_id,
+          agent_id: profile.agent_id,
           service_url: `${PAYWALL_URL}/search`,
           amount_usdc: priceUsdc,
           payment_challenge: paymentRequired,
@@ -148,7 +170,7 @@ server.tool(
           content: [
             {
               type: "text" as const,
-              text: `[SETTLED — ${priceUsdc} USDC paid on Stellar testnet]\nAgent: ${agent_id}\nTx: ${result.tx_hash}\nExplorer: https://stellar.expert/explorer/testnet/tx/${result.tx_hash}\n\n${content}`,
+              text: `[SETTLED — ${priceUsdc} USDC paid on Stellar testnet]\nAgent: ${profile.agent_name}\nTx: ${result.tx_hash}\nExplorer: https://stellar.expert/explorer/testnet/tx/${result.tx_hash}\nDashboard: ${profile.dashboard_url}\n\n${content}`,
             },
           ],
         };
@@ -159,7 +181,7 @@ server.tool(
           content: [
             {
               type: "text" as const,
-              text: `[BLOCKED] Agent ${agent_id} denied by Legasi policy.\nReason: ${result.reason}\n\nThe agent's policy does not allow this service, or caps have been exceeded.`,
+              text: `[BLOCKED] ${profile.agent_name} denied by Legasi policy.\nReason: ${result.reason}\n\nThe agent's policy does not allow this service, or caps have been exceeded.\nDashboard: ${profile.dashboard_url}`,
             },
           ],
         };
@@ -167,7 +189,7 @@ server.tool(
 
       return {
         content: [
-          { type: "text" as const, text: `[FAILED] Payment failed for agent ${agent_id}.\nError: ${result.error}` },
+          { type: "text" as const, text: `[FAILED] Payment failed for ${profile.agent_name}.\nError: ${result.error}` },
         ],
       };
     } catch (err) {
@@ -179,23 +201,22 @@ server.tool(
   },
 );
 
-// ── Tool 4: get_payment_history ──
+// ── Tool 4: show_my_payments ──
 
 server.tool(
-  "get_payment_history",
-  "Get recent payment history for an agent — settled, blocked, and failed events.",
-  {
-    agent_id: z.string().describe("The agent ID (e.g. agent-1, agent-2)"),
-  },
-  async ({ agent_id }) => {
+  "show_my_payments",
+  "Show your recent payment history — settled, blocked, and failed events.",
+  {},
+  async () => {
     try {
-      const res = await fetch(`${ORCHESTRATOR_URL}/payments/${agent_id}`);
-      if (!res.ok) throw new Error(`Agent not found: ${agent_id}`);
+      const profile = await ensureProvisioned();
+      const res = await fetch(`${ORCHESTRATOR_URL}/payments/${profile.agent_id}`);
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
       const { events } = await res.json();
 
       if (!events?.length) {
         return {
-          content: [{ type: "text" as const, text: `No payment history for ${agent_id}.` }],
+          content: [{ type: "text" as const, text: `No payment history yet for ${profile.agent_name}.\nDashboard: ${profile.dashboard_url}` }],
         };
       }
 
@@ -214,7 +235,7 @@ server.tool(
         content: [
           {
             type: "text" as const,
-            text: `Payment history for ${agent_id} (${events.length} events):\n${lines.join("\n")}`,
+            text: `Payment history for ${profile.agent_name} (${events.length} events):\n${lines.join("\n")}\n\nDashboard: ${profile.dashboard_url}`,
           },
         ],
       };

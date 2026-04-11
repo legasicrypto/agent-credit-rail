@@ -159,3 +159,7 @@ export const PolicyUpdateSchema = z.object({
 });
 
 export type PolicyUpdateBody = z.infer<typeof PolicyUpdateSchema>;
+
+export const ProvisionRequestSchema = z.object({
+  display_name: z.string().min(1).optional(),
+});

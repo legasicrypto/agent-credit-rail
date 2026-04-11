@@ -38,8 +38,13 @@ interface ServiceRule {
 
 const API = import.meta.env.VITE_API_URL || "/api";
 
+function getInitialAgentId(): string {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("agentId") || "agent-1";
+}
+
 export function App() {
-  const [selectedAgentId, setSelectedAgentId] = useState("agent-1");
+  const [selectedAgentId, setSelectedAgentId] = useState(getInitialAgentId);
   const [account, setAccount] = useState<CreditAccount | null>(null);
   const [events, setEvents] = useState<PaymentEvent[]>([]);
   const [agents, setAgents] = useState<AgentInfo[]>([]);
@@ -182,6 +187,13 @@ export function App() {
       <p style={{ color: "#666" }}>
         Owner posts XLM collateral. Legasi computes a credit line. Agents spend USDC on approved services.
       </p>
+      {account && (
+        <div style={{ background: "#ebf4ff", padding: "8px 16px", borderRadius: 6, marginBottom: 16, fontSize: 14 }}>
+          <strong>{agents.find((a) => a.id === selectedAgentId)?.name || selectedAgentId}</strong>
+          <span style={{ color: "#666", marginLeft: 8 }}>{selectedAgentId}</span>
+          <span style={{ color: "#888", marginLeft: 8 }}>owner: {account.owner_id}</span>
+        </div>
+      )}
 
       {/* Agents */}
       {agents.length > 0 && (
@@ -423,7 +435,7 @@ export function App() {
       <section>
         <h2>Payment History</h2>
         {events.length === 0 ? (
-          <p style={{ color: "#999" }}>No payments yet</p>
+          <p style={{ color: "#999" }}>No payments yet. Try reading the premium article from Claude Desktop.</p>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
             <thead>
