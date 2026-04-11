@@ -1,6 +1,6 @@
 import { serve } from "@hono/node-server";
 import dotenv from "dotenv";
-import { createSeededStore } from "./store.js";
+import { createDemoStore } from "./store.js";
 import { createOrchestratorApp } from "./routes.js";
 import type { PaymentSettler } from "./submission.js";
 import { createX402Settler } from "./x402-settler.js";
@@ -25,11 +25,11 @@ function createSettler(): PaymentSettler {
   };
 }
 
-const store = createSeededStore();
+const store = createDemoStore();
 const settler = createSettler();
 const app = createOrchestratorApp(store, settler);
 
-serve({ fetch: app.fetch, port: PORT }, () => {
+serve({ fetch: app.fetch, port: PORT, hostname: "0.0.0.0" }, () => {
   console.log(`Legasi Orchestrator running on http://localhost:${PORT}`);
   console.log(`  POST /payment/request  → terminal orchestration response`);
   console.log(`  GET  /account/:agentId → credit account view`);

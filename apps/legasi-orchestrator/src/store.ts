@@ -37,6 +37,10 @@ export class Store {
     return this.agents.get(id);
   }
 
+  getAgentsByOwner(ownerId: string): Agent[] {
+    return [...this.agents.values()].filter((a) => a.owner_id === ownerId);
+  }
+
   // ── Collateral ──
 
   createCollateralPosition(position: CollateralPosition) {
@@ -105,23 +109,26 @@ export class Store {
 }
 
 /**
- * Fixed demo scenario:
- * - Owner: 1000 USD collateral
+ * Base demo scenario (used by tests):
+ * - Owner: 1000 USD collateral (10,000 XLM)
  * - LTV: 0.6 (purchasing power = 600 USDC)
- * - Allowlisted: /search (per-request cap 100, daily cap 500)
- * - Blocked example: unknown-api.xyz (synthetic — not a real service)
+ * - agent-1 "Demo Agent": /search allowlisted, unknown-api.xyz denylisted
+ * - agent-2 "Research Agent": /research + /search allowlisted (lower caps)
+ * - No pre-seeded events (clean for assertions)
  */
 export function createSeededStore(): Store {
   const store = new Store();
 
   store.createOwner({ id: "owner-1", name: "Demo Owner" });
   store.createAgent({ id: "agent-1", owner_id: "owner-1", name: "Demo Agent" });
+  store.createAgent({ id: "agent-2", owner_id: "owner-1", name: "Research Agent" });
   store.createCollateralPosition({
     owner_id: "owner-1",
     asset: "XLM",
     amount: 10000,
     value_usd: 1000,
   });
+
   store.createPolicy({
     agent_id: "agent-1",
     services: [
@@ -131,7 +138,98 @@ export function createSeededStore(): Store {
         per_request_cap_usdc: 100,
         daily_cap_usdc: 500,
       },
+      {
+        service_url: "unknown-api.xyz",
+        allowed: false,
+        per_request_cap_usdc: 0,
+        daily_cap_usdc: 0,
+      },
     ],
+  });
+
+  store.createPolicy({
+    agent_id: "agent-2",
+    services: [
+      {
+        service_url: "/research",
+        allowed: true,
+        per_request_cap_usdc: 50,
+        daily_cap_usdc: 150,
+      },
+      {
+        service_url: "/search",
+        allowed: true,
+        per_request_cap_usdc: 20,
+        daily_cap_usdc: 60,
+      },
+    ],
+  });
+
+  return store;
+}
+
+/**
+ * Demo store with pre-seeded events for a non-empty dashboard.
+ * Used by main.ts only — tests use createSeededStore() for clean state.
+ */
+export function createDemoStore(): Store {
+  const store = createSeededStore();
+  const now = Date.now();
+
+  // agent-1: one settled, one blocked
+  store.createAttempt({
+    attempt_id: "seed-att-1",
+    agent_id: "agent-1",
+    service_url: "/search",
+    amount_usdc: 10,
+    status: "settled",
+    created_at: now - 300_000,
+  });
+  store.recordEvent({
+    kind: "settled",
+    attempt_id: "seed-att-1",
+    agent_id: "agent-1",
+    service_url: "/search",
+    amount_usdc: 10,
+    tx_hash: "seed-tx-abc123def456",
+    created_at: now - 300_000,
+  });
+
+  store.createAttempt({
+    attempt_id: "seed-att-2",
+    agent_id: "agent-1",
+    service_url: "unknown-api.xyz",
+    amount_usdc: 10,
+    status: "blocked",
+    created_at: now - 180_000,
+  });
+  store.recordEvent({
+    kind: "blocked",
+    attempt_id: "seed-att-2",
+    agent_id: "agent-1",
+    service_url: "unknown-api.xyz",
+    amount_usdc: 10,
+    reason: "DENYLISTED",
+    created_at: now - 180_000,
+  });
+
+  // agent-2: one settled
+  store.createAttempt({
+    attempt_id: "seed-att-3",
+    agent_id: "agent-2",
+    service_url: "/research",
+    amount_usdc: 25,
+    status: "settled",
+    created_at: now - 120_000,
+  });
+  store.recordEvent({
+    kind: "settled",
+    attempt_id: "seed-att-3",
+    agent_id: "agent-2",
+    service_url: "/research",
+    amount_usdc: 25,
+    tx_hash: "seed-tx-789ghi012jkl",
+    created_at: now - 120_000,
   });
 
   return store;

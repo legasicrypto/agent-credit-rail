@@ -1,0 +1,18 @@
+app = 'legasi-dashboard'
+primary_region = 'cdg'
+
+[build]
+  dockerfile = 'Dockerfile'
+  [build.args]
+    VITE_API_URL = 'https://legasi-orchestrator.fly.dev'
+
+[http_service]
+  internal_port = 4030
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '256mb'

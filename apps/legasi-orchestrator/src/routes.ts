@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { PaymentRequestSchema } from "@agent-credit-rail/shared-types";
 import type { AgentCreditAccount } from "@agent-credit-rail/shared-types";
 import { computePurchasingPower } from "@agent-credit-rail/credit-engine";
@@ -8,6 +9,8 @@ import { submitPayment, type PaymentSettler } from "./submission.js";
 
 export function createOrchestratorApp(store: Store, settler: PaymentSettler) {
   const app = new Hono();
+
+  app.use("*", cors());
 
   app.get("/health", (c) => c.json({ status: "ok" }));
 
@@ -84,6 +87,34 @@ export function createOrchestratorApp(store: Store, settler: PaymentSettler) {
       collateral_asset: collateral.asset,
       collateral_amount: collateral.amount,
     });
+  });
+
+  /**
+   * GET /policy/:agentId → policy rules for an agent
+   */
+  app.get("/policy/:agentId", (c) => {
+    const agentId = c.req.param("agentId");
+    const agent = store.getAgent(agentId);
+    if (!agent) {
+      return c.json({ error: "Agent not found" }, 404);
+    }
+
+    const policy = store.getPolicy(agentId);
+    return c.json({ policy: policy ?? { agent_id: agentId, services: [] } });
+  });
+
+  /**
+   * GET /agents/:ownerId → agents belonging to an owner
+   */
+  app.get("/agents/:ownerId", (c) => {
+    const ownerId = c.req.param("ownerId");
+    const owner = store.getOwner(ownerId);
+    if (!owner) {
+      return c.json({ error: "Owner not found" }, 404);
+    }
+
+    const agents = store.getAgentsByOwner(ownerId);
+    return c.json({ agents });
   });
 
   /**

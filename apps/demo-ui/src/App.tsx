@@ -23,29 +23,58 @@ interface PaymentEvent {
   created_at: number;
 }
 
-const API = "/api";
-const AGENT_ID = "agent-1";
+interface AgentInfo {
+  id: string;
+  owner_id: string;
+  name: string;
+}
+
+interface ServiceRule {
+  service_url: string;
+  allowed: boolean;
+  per_request_cap_usdc: number;
+  daily_cap_usdc: number;
+}
+
+const API = import.meta.env.VITE_API_URL || "/api";
 
 export function App() {
+  const [selectedAgentId, setSelectedAgentId] = useState("agent-1");
   const [account, setAccount] = useState<CreditAccount | null>(null);
   const [events, setEvents] = useState<PaymentEvent[]>([]);
+  const [agents, setAgents] = useState<AgentInfo[]>([]);
+  const [policyRules, setPolicyRules] = useState<ServiceRule[]>([]);
   const [lastAction, setLastAction] = useState<string>("");
 
   const refresh = useCallback(async () => {
     try {
-      const [accRes, evtRes] = await Promise.all([
-        fetch(`${API}/account/${AGENT_ID}`),
-        fetch(`${API}/payments/${AGENT_ID}`),
+      const [accRes, evtRes, polRes] = await Promise.all([
+        fetch(`${API}/account/${selectedAgentId}`),
+        fetch(`${API}/payments/${selectedAgentId}`),
+        fetch(`${API}/policy/${selectedAgentId}`),
       ]);
-      if (accRes.ok) setAccount(await accRes.json());
+      if (accRes.ok) {
+        const acc = await accRes.json();
+        setAccount(acc);
+        // Fetch agents for this owner
+        const agentsRes = await fetch(`${API}/agents/${acc.owner_id}`);
+        if (agentsRes.ok) {
+          const data = await agentsRes.json();
+          setAgents(data.agents || []);
+        }
+      }
       if (evtRes.ok) {
         const data = await evtRes.json();
         setEvents(data.events || []);
       }
+      if (polRes.ok) {
+        const data = await polRes.json();
+        setPolicyRules(data.policy?.services || []);
+      }
     } catch {
       // orchestrator not running
     }
-  }, []);
+  }, [selectedAgentId]);
 
   useEffect(() => {
     refresh();
@@ -58,7 +87,7 @@ export function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          agent_id: AGENT_ID,
+          agent_id: selectedAgentId,
           service_url: serviceUrl,
           amount_usdc: amount,
         }),
@@ -81,14 +110,56 @@ export function App() {
     ? account.purchasing_power_usdc - account.used_power_usdc
     : 0;
 
+  // Compute daily spend per service from today's events
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayMs = todayStart.getTime();
+
+  const dailySpendByService = events
+    .filter((e) => e.kind === "settled" && e.created_at >= todayMs)
+    .reduce(
+      (acc, e) => {
+        acc[e.service_url] = (acc[e.service_url] || 0) + e.amount_usdc;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 800, margin: "0 auto", padding: 24 }}>
+    <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 900, margin: "0 auto", padding: 24 }}>
       <h1 style={{ borderBottom: "2px solid #333", paddingBottom: 8 }}>
         Agent Credit Rail
       </h1>
       <p style={{ color: "#666" }}>
-        Owner posts XLM collateral. Legasi computes a credit line. Agent spends USDC on approved services.
+        Owner posts XLM collateral. Legasi computes a credit line. Agents spend USDC on approved services.
       </p>
+
+      {/* Agents */}
+      {agents.length > 0 && (
+        <section style={{ marginBottom: 16 }}>
+          <h2 style={{ margin: "0 0 8px" }}>Agents</h2>
+          <div style={{ display: "flex", gap: 8 }}>
+            {agents.map((agent) => (
+              <button
+                key={agent.id}
+                onClick={() => setSelectedAgentId(agent.id)}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 6,
+                  border: agent.id === selectedAgentId ? "2px solid #2b6cb0" : "1px solid #ccc",
+                  background: agent.id === selectedAgentId ? "#ebf4ff" : "#fff",
+                  fontWeight: agent.id === selectedAgentId ? 600 : 400,
+                  cursor: "pointer",
+                  fontSize: 14,
+                }}
+              >
+                {agent.name}
+                <span style={{ display: "block", fontSize: 11, color: "#888" }}>{agent.id}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Credit Account */}
       <section style={{ background: "#f5f5f5", padding: 16, borderRadius: 8, marginBottom: 16 }}>
@@ -105,7 +176,7 @@ export function App() {
                 value={`${availablePower} USDC`}
                 highlight={availablePower < 100}
               />
-              <Stat label="Agent" value={account.agent_id} />
+              <Stat label="Agent" value={`${account.agent_id}`} />
             </div>
             <div style={{ marginTop: 8, fontSize: 12, color: "#888" }}>
               Payments settle in USDC on Stellar testnet
@@ -130,20 +201,70 @@ export function App() {
         </div>
       )}
 
+      {/* Policy Rules */}
+      {policyRules.length > 0 && (
+        <section style={{ marginBottom: 16 }}>
+          <h2>Policy Rules</h2>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+            <thead>
+              <tr style={{ borderBottom: "2px solid #ddd", textAlign: "left" }}>
+                <th style={{ padding: "8px 4px" }}>Service</th>
+                <th style={{ padding: "8px 4px" }}>Status</th>
+                <th style={{ padding: "8px 4px" }}>Per-request cap</th>
+                <th style={{ padding: "8px 4px" }}>Daily cap</th>
+                <th style={{ padding: "8px 4px" }}>Spent today</th>
+                <th style={{ padding: "8px 4px" }}>Remaining today</th>
+              </tr>
+            </thead>
+            <tbody>
+              {policyRules.map((rule) => {
+                const spent = dailySpendByService[rule.service_url] || 0;
+                const remaining = rule.allowed ? Math.max(0, rule.daily_cap_usdc - spent) : 0;
+                return (
+                  <tr key={rule.service_url} style={{ borderBottom: "1px solid #eee" }}>
+                    <td style={{ padding: "6px 4px", fontFamily: "monospace" }}>{rule.service_url}</td>
+                    <td style={{ padding: "6px 4px" }}>
+                      <span
+                        style={{
+                          background: rule.allowed ? "#c6f6d5" : "#fed7d7",
+                          color: rule.allowed ? "#22543d" : "#742a2a",
+                          padding: "2px 8px",
+                          borderRadius: 4,
+                          fontSize: 12,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {rule.allowed ? "ALLOWED" : "DENIED"}
+                      </span>
+                    </td>
+                    <td style={{ padding: "6px 4px" }}>{rule.allowed ? `${rule.per_request_cap_usdc} USDC` : "—"}</td>
+                    <td style={{ padding: "6px 4px" }}>{rule.allowed ? `${rule.daily_cap_usdc} USDC` : "—"}</td>
+                    <td style={{ padding: "6px 4px" }}>{rule.allowed ? `${spent} USDC` : "—"}</td>
+                    <td style={{ padding: "6px 4px", color: remaining < 50 && rule.allowed ? "#c53030" : undefined }}>
+                      {rule.allowed ? `${remaining} USDC` : "—"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </section>
+      )}
+
       {/* Actions */}
       <section style={{ marginBottom: 16 }}>
         <h2>Actions</h2>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <ActionButton
-            label="Pay /search (10 USDC)"
-            onClick={() => sendPayment("/search", 10)}
-            color="#2b6cb0"
-          />
-          <ActionButton
-            label="Pay /search (100 USDC)"
-            onClick={() => sendPayment("/search", 100)}
-            color="#2b6cb0"
-          />
+          {policyRules
+            .filter((r) => r.allowed)
+            .map((rule) => (
+              <ActionButton
+                key={`pay-${rule.service_url}`}
+                label={`Pay ${rule.service_url} (10 USDC)`}
+                onClick={() => sendPayment(rule.service_url, 10)}
+                color="#2b6cb0"
+              />
+            ))}
           <ActionButton
             label="Try unknown-api.xyz (blocked)"
             onClick={() => sendPayment("unknown-api.xyz", 10)}
@@ -169,18 +290,35 @@ export function App() {
                 <th style={{ padding: "8px 4px" }}>Status</th>
                 <th style={{ padding: "8px 4px" }}>Service</th>
                 <th style={{ padding: "8px 4px" }}>Amount</th>
+                <th style={{ padding: "8px 4px" }}>Rule / Reason</th>
                 <th style={{ padding: "8px 4px" }}>Details</th>
-                <th style={{ padding: "8px 4px" }}>Attempt ID</th>
+                <th style={{ padding: "8px 4px" }}>Time</th>
               </tr>
             </thead>
             <tbody>
               {[...events].reverse().map((evt) => (
-                <tr key={evt.attempt_id} style={{ borderBottom: "1px solid #eee" }}>
+                <tr
+                  key={evt.attempt_id}
+                  style={{
+                    borderBottom: "1px solid #eee",
+                    background:
+                      evt.kind === "settled"
+                        ? "#f0fff4"
+                        : evt.kind === "blocked"
+                          ? "#fff5f5"
+                          : "#fffaf0",
+                  }}
+                >
                   <td style={{ padding: "6px 4px" }}>
                     <StatusBadge kind={evt.kind} />
                   </td>
-                  <td style={{ padding: "6px 4px" }}>{evt.service_url}</td>
+                  <td style={{ padding: "6px 4px", fontFamily: "monospace" }}>{evt.service_url}</td>
                   <td style={{ padding: "6px 4px" }}>{evt.amount_usdc} USDC</td>
+                  <td style={{ padding: "6px 4px", fontSize: 12 }}>
+                    {evt.kind === "settled" && "ALLOWLISTED"}
+                    {evt.kind === "blocked" && evt.reason}
+                    {evt.kind === "failed" && "FAILED"}
+                  </td>
                   <td style={{ padding: "6px 4px", fontSize: 12, color: "#666" }}>
                     {evt.kind === "settled" && evt.tx_hash && (
                       <a
@@ -189,14 +327,14 @@ export function App() {
                         rel="noopener noreferrer"
                         style={{ color: "#2b6cb0" }}
                       >
-                        {evt.tx_hash.slice(0, 12)}...
+                        {evt.tx_hash.slice(0, 16)}...
                       </a>
                     )}
                     {evt.kind === "blocked" && evt.reason}
                     {evt.kind === "failed" && evt.error}
                   </td>
-                  <td style={{ padding: "6px 4px", fontSize: 11, fontFamily: "monospace", color: "#999" }}>
-                    {evt.attempt_id}
+                  <td style={{ padding: "6px 4px", fontSize: 12, color: "#888" }}>
+                    {new Date(evt.created_at).toLocaleTimeString()}
                   </td>
                 </tr>
               ))}
