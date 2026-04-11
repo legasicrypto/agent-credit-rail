@@ -78,7 +78,33 @@ server.tool(
   },
 );
 
-// ── Tool 2: show_my_policy ──
+// ── Tool 2: get_dashboard_link ──
+
+server.tool(
+  "get_dashboard_link",
+  "Get the dashboard URL for this session's Legasi agent. The dashboard shows payment history, policy rules, and credit usage in real time.",
+  {},
+  async () => {
+    try {
+      const profile = await ensureProvisioned();
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `Dashboard for ${profile.agent_name}: ${profile.dashboard_url}`,
+          },
+        ],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: "text" as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }],
+        isError: true,
+      };
+    }
+  },
+);
+
+// ── Tool 3: show_my_policy ──
 
 server.tool(
   "show_my_policy",
