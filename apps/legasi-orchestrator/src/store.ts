@@ -37,6 +37,10 @@ export class Store {
     return this.agents.get(id);
   }
 
+  getAllAgents(): Agent[] {
+    return [...this.agents.values()];
+  }
+
   getAgentsByOwner(ownerId: string): Agent[] {
     return [...this.agents.values()].filter((a) => a.owner_id === ownerId);
   }

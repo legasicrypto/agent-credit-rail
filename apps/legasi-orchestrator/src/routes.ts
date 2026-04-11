@@ -168,6 +168,14 @@ export function createOrchestratorApp(store: Store, settler: PaymentSettler) {
   });
 
   /**
+   * GET /agents → all agents across all owners
+   */
+  app.get("/agents", (c) => {
+    const agents = store.getAllAgents();
+    return c.json({ agents });
+  });
+
+  /**
    * GET /agents/:ownerId → agents belonging to an owner
    */
   app.get("/agents/:ownerId", (c) => {

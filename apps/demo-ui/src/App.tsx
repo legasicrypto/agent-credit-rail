@@ -64,12 +64,12 @@ export function App() {
       if (accRes.ok) {
         const acc = await accRes.json();
         setAccount(acc);
-        // Fetch agents for this owner
-        const agentsRes = await fetch(`${API}/agents/${acc.owner_id}`);
-        if (agentsRes.ok) {
-          const data = await agentsRes.json();
-          setAgents(data.agents || []);
-        }
+      }
+      // Fetch all agents across all owners
+      const agentsRes = await fetch(`${API}/agents`);
+      if (agentsRes.ok) {
+        const data = await agentsRes.json();
+        setAgents(data.agents || []);
       }
       if (evtRes.ok) {
         const data = await evtRes.json();
