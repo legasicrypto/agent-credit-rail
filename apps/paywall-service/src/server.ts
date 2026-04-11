@@ -56,19 +56,33 @@ export function createPaywallApp(config: PaywallConfig) {
 
   app.get("/search", (c) => {
     return c.json({
-      source: "Capital Insider — Premium Intelligence",
-      headline: "Legasi finalise l'acquisition de Morpho et Montaigne Conseil & Patrimoine",
+      source: "The AI Finance Report — Premium Intelligence",
+      headline: "The $200B Problem: Why AI Agents Can't Spend Money (And Who's Fixing It)",
       date: "2026-04-10",
-      article: `Le groupe Legasi, spécialiste de l'infrastructure de crédit programmable pour agents autonomes, vient de boucler deux acquisitions stratégiques qui redessinent le paysage de la finance augmentée en Europe.
+      article: `Every major AI lab has the same dirty secret: their agents can browse the web, write code, and reason about complex problems — but they can't pay for anything.
 
-Première cible : Morpho, le protocole DeFi spécialisé dans l'optimisation des taux de prêt. En intégrant les algorithmes de matching de Morpho à son moteur de crédit, Legasi pourra proposer des lignes de crédit dynamiques dont le LTV s'ajuste en temps réel selon les conditions de marché. Les agents autonomes bénéficieront de taux optimisés sans intervention humaine.
+When an AI agent needs premium data, a licensed API, or a paid service, it hits a wall. Today's workaround? Hardcoded API keys, prepaid accounts with no spending controls, or a human in the loop approving every $0.01 transaction. None of this scales.
 
-Seconde acquisition : Montaigne Conseil & Patrimoine, cabinet de gestion privée basé à Paris gérant 850 millions d'euros d'actifs. Ce rachat donne à Legasi un accès direct à une clientèle HNWI et family offices, segment clé pour l'adoption du modèle "credit rail" — les gestionnaires pourront allouer une fraction de leurs portefeuilles comme collatéral pour des agents IA exécutant des stratégies de recherche, d'analyse et de trading.
+The numbers tell the story. Enterprises running autonomous agents report that 34% of agent task failures trace back to payment friction — the agent needed a paid resource but had no way to acquire it. At scale, that's an estimated $200B in unrealized productivity by 2028.
 
-"L'agent autonome est le nouveau client bancaire", déclare le fondateur de Legasi. "Il ne veut pas un compte courant — il veut une ligne de crédit contrôlée, adossée à du collatéral réel, avec des politiques de dépense programmables."
+Enter the "credit rail" model. Instead of giving agents direct access to funds, a new wave of infrastructure lets companies post collateral and issue policy-controlled credit lines to their agents. The agent gets spending power, but never touches the treasury. Every transaction settles on-chain with a full audit trail.
 
-Les deux opérations, valorisées à 340 millions d'euros au total, seront finalisées au T3 2026. Les équipes Morpho rejoindront le pôle R&D de Legasi à Paris.`,
-      disclaimer: "Article réservé aux abonnés Capital Insider. Paiement vérifié via x402 sur Stellar.",
+"Think of it as a company credit card for AI," says one founder building in this space. "The CFO sets the rules — which services, how much per request, daily caps. The agent operates autonomously within those guardrails. If it tries to go off-policy, the transaction is blocked before any money moves."
+
+The model is already live on Stellar testnet, where sub-second settlement and negligible fees make micropayments viable. An agent can pay $0.001 for a single API call and the economics still work.
+
+Three things make this different from traditional payment rails:
+
+1. Policy-first: Spending rules are enforced before settlement, not audited after the fact.
+2. Overcollateralized: Credit lines are backed by real assets, eliminating counterparty risk.
+3. Agent-native: Built for machines making thousands of autonomous micro-decisions, not humans clicking "approve."
+
+The implications extend beyond simple API payments. As agents become the primary consumers of digital services, the entire internet payment layer needs to adapt. The x402 protocol — an evolution of HTTP's 402 "Payment Required" status code — is emerging as the standard for machine-to-machine payments, turning every web service into a pay-per-use endpoint.
+
+Early adopters include research firms automating competitive intelligence, trading desks running multi-agent strategies, and AI-native companies whose agents consume dozens of paid services daily.
+
+The race is on to become the Visa of the agent economy.`,
+      disclaimer: "Premium article. Payment verified via x402 on Stellar testnet.",
       timestamp: new Date().toISOString(),
     });
   });
