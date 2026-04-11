@@ -122,7 +122,7 @@ x402-adapter          ← depends on shared-types, stellar-auth
 legasi-orchestrator   ← depends on credit-engine, x402-adapter, stellar-auth, shared-types
 paywall-service       ← depends on x402-adapter, shared-types
 agent-client          ← depends on x402-adapter, shared-types
-mcp-server            ← depends on shared-types (HTTP calls to orchestrator/paywall, uses @modelcontextprotocol/sdk)
+mcp-server            ← standalone (HTTP calls to orchestrator/paywall, uses @modelcontextprotocol/sdk)
 demo-ui               ← depends on shared-types
 ```
 

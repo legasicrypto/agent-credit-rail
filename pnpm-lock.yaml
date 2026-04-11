@@ -110,9 +110,6 @@ importers:
 
   apps/mcp-server:
     dependencies:
-      '@agent-credit-rail/shared-types':
-        specifier: workspace:*
-        version: link:../../packages/shared-types
       '@modelcontextprotocol/sdk':
         specifier: ^1.12.1
         version: 1.29.0(zod@3.25.76)

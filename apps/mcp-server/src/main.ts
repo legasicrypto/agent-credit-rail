@@ -1,10 +1,15 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import type { OrchestrationResponse } from "@agent-credit-rail/shared-types";
 import dotenv from "dotenv";
 
 dotenv.config({ path: new URL("../../../.env", import.meta.url).pathname });
+
+// Inlined from @agent-credit-rail/shared-types to keep MCP server standalone
+type OrchestrationResponse =
+  | { status: "settled"; attempt_id: string; tx_hash: string; result: unknown }
+  | { status: "blocked"; attempt_id: string; reason: string }
+  | { status: "failed"; attempt_id: string; error: string };
 
 const ORCHESTRATOR_URL =
   process.env.ORCHESTRATOR_URL || "https://legasi-orchestrator-production.up.railway.app";

@@ -27,57 +27,70 @@ Open your Claude Desktop config file:
 - **Mac**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
-Add to `mcpServers`:
+Copy-paste this into the file. The only thing to change is `PATH_TO_REPO` on the two lines marked below:
 
 ```json
 {
   "mcpServers": {
     "legasi-credit-rail": {
-      "command": "<path-to-repo>/apps/mcp-server/node_modules/.bin/tsx",
-      "args": ["apps/mcp-server/src/main.ts"],
-      "cwd": "<path-to-repo>"
+      "command": "npx",
+      "args": ["tsx", "apps/mcp-server/src/main.ts"],
+      "cwd": "PATH_TO_REPO"
     }
   }
 }
 ```
 
-Replace `<path-to-repo>` with the full path to the cloned repository.
+Replace `PATH_TO_REPO` with the output of:
+
+```bash
+# Mac / Linux
+pwd
+
+# Windows
+cd
+```
+
+For example: `/Users/yourname/agent-credit-rail` or `C:\Users\yourname\agent-credit-rail`.
 
 ### 3. Restart Claude Desktop
 
-Quit (Cmd+Q / Alt+F4) and relaunch. You should see the hammer icon with tools available.
+Quit (Cmd+Q / Alt+F4) and relaunch. You should see the hammer icon (🔨) with 5 tools available.
 
-## Example prompts
+## Demo script
 
-Try these in order:
+Try these prompts in order:
 
-**1. Set up your Legasi profile**
-> Set up Legasi for this Claude session. My name is [your name].
+### 1. Set up your Legasi profile
+> Set up Legasi for me. My name is [your name].
 
-This provisions a fresh agent with a 600 USDC credit line backed by demo collateral. You'll receive a personal dashboard link.
+You get a fresh agent with a **600 USDC credit line** backed by 10,000 XLM demo collateral, and a personal dashboard link.
 
-**2. Check your policy**
+### 2. Check your policy
 > Show my policy.
 
-**3. Read a premium article (approved flow)**
+### 3. Read a premium article (approved flow)
 > Read the premium article.
 
-Watch the payment settle in real time on Stellar testnet. Click the explorer link to verify.
+Watch the payment settle in real time on Stellar testnet. Click the Stellar Explorer link to verify the on-chain USDC transfer.
 
-**4. Check your payment history**
+### 4. Check your payment history
 > Show my payment history.
 
-**5. Test policy enforcement**
-> Go to my dashboard and block `/search`, then try reading the article again.
+### 5. Test policy enforcement (blocked flow)
 
-Open your dashboard link, click Edit on Policy Rules, toggle `/search` to DENIED, save. Then ask Claude to read the article again — it will be blocked.
+Open your dashboard link, click **Edit** on Policy Rules, toggle `/search` to **DENIED**, save. Then:
+
+> Read the premium article again.
+
+The payment will be **blocked** by policy. Toggle it back to ALLOWED to restore access.
 
 ## What to observe
 
 After each prompt, open your personal dashboard link and watch:
 
-- **Payment History** — new settled (green) or blocked (red) events appear
-- **Policy Rules** — caps and daily spend update in real time
+- **Payment History** — settled (green) or blocked (red) events appear in real time
+- **Policy Rules** — per-request and daily caps
 - **Power Bar** — available credit decreases after each settled payment
 - **Stellar Explorer** — click any tx hash to see the real USDC settlement on Stellar testnet
 
