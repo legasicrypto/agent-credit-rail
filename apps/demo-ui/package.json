@@ -12,8 +12,10 @@
     "lint": "echo 'no lint configured yet'"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.2.2",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
     "@types/react": "^19.1.0",
