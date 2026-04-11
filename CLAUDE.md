@@ -42,9 +42,9 @@ This is a pnpm workspace monorepo. Workspaces are declared in `pnpm-workspace.ya
 **Apps** (`apps/`):
 - `legasi-orchestrator` — central service: credit engine, policy engine, Stellar tx submission, payment logging
 - `paywall-service` — x402-protected demo service (returns 402, unlocks after settlement)
-- `demo-ui` — owner/agent dashboard
+- `demo-ui` — React/Vite dashboard: agent selector, credit account display, inline policy editing (`PUT /policy/:agentId`), payment actions, payment history with Stellar Explorer links. Supports `?agentId=` deep linking for MCP provisioning flow.
 - `agent-client` — CLI or MCP-style client that requests services and authorizes payments
-- `mcp-server` — 4-tool MCP server (stdio transport) for Claude Desktop; exposes `list_agents`, `get_policy`, `read_premium_article`, `get_payment_history`
+- `mcp-server` — 5-tool MCP server (stdio transport) for Claude Desktop; exposes `setup_legasi`, `get_dashboard_link`, `show_my_policy`, `read_premium_article`, `show_my_payments`. Each Claude Desktop session auto-provisions its own agent via `POST /provision` on first tool use.
 
 **Packages** (`packages/`):
 - `credit-engine` — collateral valuation, LTV computation, purchasing power logic
@@ -59,24 +59,30 @@ Defined in `.env.example` at repo root:
 - `STELLAR_PAYEE_ADDRESS` — paywall's Stellar testnet address
 - `STELLAR_NETWORK`, `FACILITATOR_URL` — x402 settlement config
 - `PAYWALL_PORT` (4020), `ORCHESTRATOR_PORT` (4010), `PAYWALL_PRICE` ($0.001)
-- `ORCHESTRATOR_URL`, `PAYWALL_URL` — used by MCP server (default to Fly.dev production URLs)
-- `VITE_API_URL` — demo-ui build arg for API endpoint
+- `ORCHESTRATOR_URL`, `PAYWALL_URL` — used by MCP server (default to Railway production URLs)
+- `VITE_API_URL` — demo-ui build arg for API endpoint (build-time coupled to orchestrator URL)
+- `DASHBOARD_URL` — used by MCP server and `/provision` route (defaults to Railway dashboard URL)
 
 ## Orchestrator internals
 
 - **Framework**: Hono (via `@hono/node-server`)
 - **Settler abstraction**: `PaymentSettler` interface with two implementations — `createX402Settler(secretKey)` for real Stellar testnet, inline mock settler when `STELLAR_TESTNET_SECRET_KEY` is unset
-- **API routes**: `POST /payment/request`, `GET /account/:agentId`, `GET /payments/:agentId`, `GET /agents/:ownerId`, `GET /policy/:agentId`, `GET /health`
+- **API routes**: `POST /provision`, `POST /payment/request`, `GET /account/:agentId`, `GET /policy/:agentId`, `PUT /policy/:agentId`, `GET /agents`, `GET /agents/:ownerId`, `GET /payments/:agentId`, `GET /health`
 - **Seed data**: owner with 10,000 XLM ($1,000 USD), LTV 0.6, purchasing power 600 USDC, one agent `agent-1`
 
 ## Deployment
 
-Three apps deploy to **Fly.io** (region `cdg` / Paris), all scale-to-zero:
-- `legasi-orchestrator` → `legasi-orchestrator.fly.dev` (port 4010)
-- `legasi-paywall` → `legasi-paywall.fly.dev` (port 4020)
-- `legasi-dashboard` → demo-ui (port 4030)
+Three apps deploy to **Railway** (project: `generous-curiosity`). In-memory state is **ephemeral** — redeploys/restarts reset demo data.
+
+| Service | URL | Port | Dockerfile | Key env vars |
+|---|---|---|---|---|
+| `legasi-orchestrator` | `legasi-orchestrator-production.up.railway.app` | 4010 | Root `Dockerfile` (`APP_ENTRYPOINT=apps/legasi-orchestrator/src/main.ts`) | `ORCHESTRATOR_PORT`, `DASHBOARD_URL`, `STELLAR_TESTNET_SECRET_KEY` (optional) |
+| `legasi-paywall` | `legasi-paywall-production.up.railway.app` | 4020 | Root `Dockerfile` (`APP_ENTRYPOINT=apps/paywall-service/src/main.ts`) | `PAYWALL_PORT`, `STELLAR_PAYEE_ADDRESS`, `STELLAR_NETWORK`, `FACILITATOR_URL` |
+| `legasi-dashboard` | `legasi-dashboard-production.up.railway.app` | 4030 | `apps/demo-ui/Dockerfile` (`RAILWAY_DOCKERFILE_PATH`) | `VITE_API_URL` (build-time, points to orchestrator URL) |
 
 Shared `Dockerfile` at repo root (node:22-slim + pnpm + tsx) for orchestrator and paywall. Separate Dockerfile in `apps/demo-ui/` (Vite build + serve).
+
+**MCP server URLs**: Set `ORCHESTRATOR_URL`, `PAYWALL_URL`, `DASHBOARD_URL` as env vars where MCP runs. Source defaults are Railway URLs as fallback only — do not rely on them as the primary config mechanism.
 
 ## Key domain concepts
 
@@ -116,11 +122,21 @@ x402-adapter          ← depends on shared-types, stellar-auth
 legasi-orchestrator   ← depends on credit-engine, x402-adapter, stellar-auth, shared-types
 paywall-service       ← depends on x402-adapter, shared-types
 agent-client          ← depends on x402-adapter, shared-types
-mcp-server            ← standalone (HTTP calls to orchestrator/paywall, uses @modelcontextprotocol/sdk)
+mcp-server            ← depends on shared-types (HTTP calls to orchestrator/paywall, uses @modelcontextprotocol/sdk)
 demo-ui               ← depends on shared-types
 ```
 
 Build order: `shared-types` → `credit-engine`, `stellar-auth` (parallel) → `x402-adapter` → apps.
+
+## What is real vs mocked
+
+| Component | Status |
+|---|---|
+| x402 paywall (402 challenge/response) | Real |
+| Stellar testnet settlement | Real (when `STELLAR_TESTNET_SECRET_KEY` set) |
+| Policy engine, credit engine, decision engine | Real |
+| Stellar submission in local dev (no secret key) | Mock (fake tx hashes) |
+| Storage (owners, agents, payments) | In-memory (resets on restart) |
 
 ## MVP constraints
 

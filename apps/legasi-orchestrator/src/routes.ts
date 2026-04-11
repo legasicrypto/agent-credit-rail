@@ -45,7 +45,7 @@ export function createOrchestratorApp(store: Store, settler: PaymentSettler) {
     };
     store.createPolicy(policy);
 
-    const dashboardBase = process.env.DASHBOARD_URL || "https://legasi-dashboard.fly.dev";
+    const dashboardBase = process.env.DASHBOARD_URL || "https://legasi-dashboard-production.up.railway.app";
 
     return c.json({
       owner_id: ownerId,

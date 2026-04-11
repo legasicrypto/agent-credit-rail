@@ -7,11 +7,11 @@ import dotenv from "dotenv";
 dotenv.config({ path: new URL("../../../.env", import.meta.url).pathname });
 
 const ORCHESTRATOR_URL =
-  process.env.ORCHESTRATOR_URL || "https://legasi-orchestrator.fly.dev";
+  process.env.ORCHESTRATOR_URL || "https://legasi-orchestrator-production.up.railway.app";
 const PAYWALL_URL =
-  process.env.PAYWALL_URL || "https://legasi-paywall.fly.dev";
+  process.env.PAYWALL_URL || "https://legasi-paywall-production.up.railway.app";
 const DASHBOARD_URL =
-  process.env.DASHBOARD_URL || "https://legasi-dashboard.fly.dev";
+  process.env.DASHBOARD_URL || "https://legasi-dashboard-production.up.railway.app";
 
 // ── Session state ──
 
@@ -54,7 +54,7 @@ const server = new McpServer({
 
 server.tool(
   "setup_legasi",
-  "Set up a Legasi spending profile for this Claude session. Provisions a fresh agent with a credit line backed by demo collateral. Call this explicitly, or it happens automatically on first use of any other tool.",
+  "Set up a Legasi spending profile for this Claude session. Provisions a fresh agent with a credit line backed by demo collateral. Call this explicitly, or it happens automatically on first use of any other tool. IMPORTANT: Always share the dashboard link with the user as a clickable URL.",
   {
     display_name: z.string().optional().describe("Your name (e.g. 'Alice'). Defaults to 'Judge' if not provided."),
   },
@@ -65,7 +65,7 @@ server.tool(
         content: [
           {
             type: "text" as const,
-            text: `Legasi profile provisioned for this session.\n\nAgent: ${profile.agent_name} (${profile.agent_id})\nCredit line: 600 USDC (backed by 10,000 XLM demo collateral)\nDashboard: ${profile.dashboard_url}\n\nYou can now read premium articles, check your policy, or view payment history.`,
+            text: `Legasi profile provisioned for this session.\n\nAgent: ${profile.agent_name} (${profile.agent_id})\nCredit line: 600 USDC (backed by 10,000 XLM demo collateral)\n\n🔗 [Open Dashboard](${profile.dashboard_url})\n\nYou can now read premium articles, check your policy, or view payment history.`,
           },
         ],
       };
@@ -82,7 +82,7 @@ server.tool(
 
 server.tool(
   "get_dashboard_link",
-  "Get the dashboard URL for this session's Legasi agent. The dashboard shows payment history, policy rules, and credit usage in real time.",
+  "Get the dashboard URL for this session's Legasi agent. The dashboard shows payment history, policy rules, and credit usage in real time. IMPORTANT: Always share the link as a clickable URL.",
   {},
   async () => {
     try {
@@ -91,7 +91,7 @@ server.tool(
         content: [
           {
             type: "text" as const,
-            text: `Dashboard for ${profile.agent_name}: ${profile.dashboard_url}`,
+            text: `Dashboard for ${profile.agent_name}:\n\n🔗 [Open Dashboard](${profile.dashboard_url})`,
           },
         ],
       };
@@ -108,7 +108,7 @@ server.tool(
 
 server.tool(
   "show_my_policy",
-  "Show the policy rules for your Legasi agent — which services are allowed or denied, per-request and daily caps.",
+  "Show the policy rules for your Legasi agent — which services are allowed or denied, per-request and daily caps. IMPORTANT: Always include the dashboard link as a clickable URL in your response.",
   {},
   async () => {
     try {
@@ -132,7 +132,7 @@ server.tool(
         content: [
           {
             type: "text" as const,
-            text: `Policy for ${profile.agent_name}:\n${lines.join("\n")}\n\nDashboard: ${profile.dashboard_url}`,
+            text: `Policy for ${profile.agent_name}:\n${lines.join("\n")}\n\n🔗 [Open Dashboard](${profile.dashboard_url})`,
           },
         ],
       };
@@ -149,7 +149,7 @@ server.tool(
 
 server.tool(
   "read_premium_article",
-  "Read a premium article behind the Legasi paywall. Your agent pays via its credit line — policy and credit are checked automatically. Payment settles in USDC on Stellar testnet.",
+  "Read a premium article behind the Legasi paywall. Your agent pays via its credit line — policy and credit are checked automatically. Payment settles in USDC on Stellar testnet. IMPORTANT: Always share the Stellar Explorer link and dashboard link as clickable URLs in your response.",
   {},
   async () => {
     try {
@@ -196,7 +196,7 @@ server.tool(
           content: [
             {
               type: "text" as const,
-              text: `[SETTLED — ${priceUsdc} USDC paid on Stellar testnet]\nAgent: ${profile.agent_name}\nTx: ${result.tx_hash}\nExplorer: https://stellar.expert/explorer/testnet/tx/${result.tx_hash}\nDashboard: ${profile.dashboard_url}\n\n${content}`,
+              text: `[SETTLED — ${priceUsdc} USDC paid on Stellar testnet]\nAgent: ${profile.agent_name}\nTx: ${result.tx_hash}\n\n🔗 [View on Stellar Explorer](https://stellar.expert/explorer/testnet/tx/${result.tx_hash})\n🔗 [Open Dashboard](${profile.dashboard_url})\n\n${content}`,
             },
           ],
         };
@@ -207,7 +207,7 @@ server.tool(
           content: [
             {
               type: "text" as const,
-              text: `[BLOCKED] ${profile.agent_name} denied by Legasi policy.\nReason: ${result.reason}\n\nThe agent's policy does not allow this service, or caps have been exceeded.\nDashboard: ${profile.dashboard_url}`,
+              text: `[BLOCKED] ${profile.agent_name} denied by Legasi policy.\nReason: ${result.reason}\n\nThe agent's policy does not allow this service, or caps have been exceeded.\n\n🔗 [Open Dashboard](${profile.dashboard_url})`,
             },
           ],
         };
@@ -231,7 +231,7 @@ server.tool(
 
 server.tool(
   "show_my_payments",
-  "Show your recent payment history — settled, blocked, and failed events.",
+  "Show your recent payment history — settled, blocked, and failed events. IMPORTANT: Always include the dashboard link as a clickable URL in your response.",
   {},
   async () => {
     try {
@@ -242,7 +242,7 @@ server.tool(
 
       if (!events?.length) {
         return {
-          content: [{ type: "text" as const, text: `No payment history yet for ${profile.agent_name}.\nDashboard: ${profile.dashboard_url}` }],
+          content: [{ type: "text" as const, text: `No payment history yet for ${profile.agent_name}.\n\n🔗 [Open Dashboard](${profile.dashboard_url})` }],
         };
       }
 
@@ -261,7 +261,7 @@ server.tool(
         content: [
           {
             type: "text" as const,
-            text: `Payment history for ${profile.agent_name} (${events.length} events):\n${lines.join("\n")}\n\nDashboard: ${profile.dashboard_url}`,
+            text: `Payment history for ${profile.agent_name} (${events.length} events):\n${lines.join("\n")}\n\n🔗 [Open Dashboard](${profile.dashboard_url})`,
           },
         ],
       };
