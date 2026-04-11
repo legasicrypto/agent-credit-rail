@@ -45,6 +45,9 @@ export function App() {
   const [agents, setAgents] = useState<AgentInfo[]>([]);
   const [policyRules, setPolicyRules] = useState<ServiceRule[]>([]);
   const [lastAction, setLastAction] = useState<string>("");
+  const [editingPolicy, setEditingPolicy] = useState(false);
+  const [editRules, setEditRules] = useState<ServiceRule[]>([]);
+  const [saving, setSaving] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -106,6 +109,52 @@ export function App() {
     }
   };
 
+  const startEditing = () => {
+    setEditRules(policyRules.map((r) => ({ ...r })));
+    setEditingPolicy(true);
+  };
+
+  const cancelEditing = () => {
+    setEditingPolicy(false);
+  };
+
+  const updateRule = (index: number, field: keyof ServiceRule, value: string | boolean | number) => {
+    setEditRules((prev) => prev.map((r, i) => (i === index ? { ...r, [field]: value } : r)));
+  };
+
+  const addRule = () => {
+    setEditRules((prev) => [
+      ...prev,
+      { service_url: "", allowed: true, per_request_cap_usdc: 0, daily_cap_usdc: 0 },
+    ]);
+  };
+
+  const removeRule = (index: number) => {
+    setEditRules((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const savePolicy = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API}/policy/${selectedAgentId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ services: editRules }),
+      });
+      if (res.ok) {
+        setLastAction("Policy saved successfully");
+        setEditingPolicy(false);
+        refresh();
+      } else {
+        const err = await res.json();
+        setLastAction(`Failed to save policy: ${err.error || "Unknown error"}`);
+      }
+    } catch {
+      setLastAction("Error: orchestrator not reachable");
+    }
+    setSaving(false);
+  };
+
   const availablePower = account
     ? account.purchasing_power_usdc - account.used_power_usdc
     : 0;
@@ -142,7 +191,11 @@ export function App() {
             {agents.map((agent) => (
               <button
                 key={agent.id}
-                onClick={() => setSelectedAgentId(agent.id)}
+                onClick={() => {
+                  if (editingPolicy && !confirm("Discard unsaved policy changes?")) return;
+                  setEditingPolicy(false);
+                  setSelectedAgentId(agent.id);
+                }}
                 style={{
                   padding: "8px 16px",
                   borderRadius: 6,
@@ -202,9 +255,95 @@ export function App() {
       )}
 
       {/* Policy Rules */}
-      {policyRules.length > 0 && (
-        <section style={{ marginBottom: 16 }}>
+      <section style={{ marginBottom: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h2>Policy Rules</h2>
+          {!editingPolicy ? (
+            <ActionButton label="Edit" onClick={startEditing} color="#2b6cb0" />
+          ) : (
+            <div style={{ display: "flex", gap: 8 }}>
+              <ActionButton label={saving ? "Saving..." : "Save"} onClick={savePolicy} color="#38a169" />
+              <ActionButton label="Cancel" onClick={cancelEditing} color="#c53030" />
+            </div>
+          )}
+        </div>
+
+        {editingPolicy ? (
+          <>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+              <thead>
+                <tr style={{ borderBottom: "2px solid #ddd", textAlign: "left" }}>
+                  <th style={{ padding: "8px 4px" }}>Service</th>
+                  <th style={{ padding: "8px 4px" }}>Status</th>
+                  <th style={{ padding: "8px 4px" }}>Per-request cap</th>
+                  <th style={{ padding: "8px 4px" }}>Daily cap</th>
+                  <th style={{ padding: "8px 4px" }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {editRules.map((rule, i) => (
+                  <tr key={i} style={{ borderBottom: "1px solid #eee" }}>
+                    <td style={{ padding: "6px 4px" }}>
+                      <input
+                        type="text"
+                        value={rule.service_url}
+                        onChange={(e) => updateRule(i, "service_url", e.target.value)}
+                        placeholder="/service-path"
+                        style={{ width: "100%", fontFamily: "monospace", padding: 4, border: "1px solid #ccc", borderRadius: 4, boxSizing: "border-box" }}
+                      />
+                    </td>
+                    <td style={{ padding: "6px 4px" }}>
+                      <button
+                        onClick={() => updateRule(i, "allowed", !rule.allowed)}
+                        style={{
+                          background: rule.allowed ? "#c6f6d5" : "#fed7d7",
+                          color: rule.allowed ? "#22543d" : "#742a2a",
+                          padding: "2px 8px",
+                          borderRadius: 4,
+                          fontSize: 12,
+                          fontWeight: 600,
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {rule.allowed ? "ALLOWED" : "DENIED"}
+                      </button>
+                    </td>
+                    <td style={{ padding: "6px 4px" }}>
+                      <input
+                        type="number"
+                        min={0}
+                        value={rule.per_request_cap_usdc}
+                        onChange={(e) => updateRule(i, "per_request_cap_usdc", Number(e.target.value) || 0)}
+                        style={{ width: 80, padding: 4, border: "1px solid #ccc", borderRadius: 4 }}
+                      />
+                    </td>
+                    <td style={{ padding: "6px 4px" }}>
+                      <input
+                        type="number"
+                        min={0}
+                        value={rule.daily_cap_usdc}
+                        onChange={(e) => updateRule(i, "daily_cap_usdc", Number(e.target.value) || 0)}
+                        style={{ width: 80, padding: 4, border: "1px solid #ccc", borderRadius: 4 }}
+                      />
+                    </td>
+                    <td style={{ padding: "6px 4px" }}>
+                      <button
+                        onClick={() => removeRule(i)}
+                        style={{ background: "#fed7d7", color: "#c53030", border: "none", borderRadius: 4, cursor: "pointer", padding: "4px 8px" }}
+                      >
+                        ✕
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div style={{ marginTop: 8 }}>
+              <ActionButton label="+ Add Service Rule" onClick={addRule} color="#2b6cb0" />
+            </div>
+          </>
+        ) : policyRules.length > 0 ? (
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
             <thead>
               <tr style={{ borderBottom: "2px solid #ddd", textAlign: "left" }}>
@@ -248,8 +387,10 @@ export function App() {
               })}
             </tbody>
           </table>
-        </section>
-      )}
+        ) : (
+          <p style={{ color: "#999" }}>No policy rules configured. Click Edit to add service rules.</p>
+        )}
+      </section>
 
       {/* Actions */}
       <section style={{ marginBottom: 16 }}>

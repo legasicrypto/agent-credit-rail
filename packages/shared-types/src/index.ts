@@ -146,3 +146,16 @@ export const PaymentRequestSchema = z.object({
 });
 
 export type PaymentRequestBody = z.infer<typeof PaymentRequestSchema>;
+
+export const ServiceRuleSchema = z.object({
+  service_url: z.string().min(1),
+  allowed: z.boolean(),
+  per_request_cap_usdc: z.number().nonnegative(),
+  daily_cap_usdc: z.number().nonnegative(),
+});
+
+export const PolicyUpdateSchema = z.object({
+  services: z.array(ServiceRuleSchema),
+});
+
+export type PolicyUpdateBody = z.infer<typeof PolicyUpdateSchema>;

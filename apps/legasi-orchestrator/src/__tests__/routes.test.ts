@@ -135,4 +135,72 @@ describe("orchestrator routes", () => {
     const res = await app.request("/account/nonexistent");
     expect(res.status).toBe(404);
   });
+
+  // ── PUT /policy/:agentId ──
+
+  it("PUT /policy/:agentId updates policy and GET confirms change", async () => {
+    const { app } = makeApp();
+    const res = await app.request("/policy/agent-1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        services: [
+          { service_url: "/new-service", allowed: true, per_request_cap_usdc: 50, daily_cap_usdc: 200 },
+        ],
+      }),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.policy.agent_id).toBe("agent-1");
+    expect(body.policy.services).toHaveLength(1);
+    expect(body.policy.services[0].service_url).toBe("/new-service");
+
+    // Confirm via GET
+    const getRes = await app.request("/policy/agent-1");
+    const getBody = await getRes.json();
+    expect(getBody.policy.services).toHaveLength(1);
+    expect(getBody.policy.services[0].service_url).toBe("/new-service");
+  });
+
+  it("PUT /policy/:agentId with invalid body returns 400", async () => {
+    const { app } = makeApp();
+    const res = await app.request("/policy/agent-1", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ services: [{ service_url: "" }] }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("PUT /policy/nonexistent returns 404", async () => {
+    const { app } = makeApp();
+    const res = await app.request("/policy/nonexistent", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        services: [{ service_url: "/x", allowed: true, per_request_cap_usdc: 10, daily_cap_usdc: 50 }],
+      }),
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it("PUT /policy/:agentId upserts when no prior policy exists", async () => {
+    const { app, store } = makeApp();
+    // Create an agent with no policy
+    store.createAgent({ id: "agent-no-policy", owner_id: "owner-1", name: "Bare Agent" });
+
+    const res = await app.request("/policy/agent-no-policy", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        services: [{ service_url: "/fresh", allowed: true, per_request_cap_usdc: 5, daily_cap_usdc: 20 }],
+      }),
+    });
+    expect(res.status).toBe(200);
+
+    const getRes = await app.request("/policy/agent-no-policy");
+    const getBody = await getRes.json();
+    expect(getBody.policy.services).toHaveLength(1);
+    expect(getBody.policy.services[0].service_url).toBe("/fresh");
+  });
 });

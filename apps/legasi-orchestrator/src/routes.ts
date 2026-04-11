@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { PaymentRequestSchema } from "@agent-credit-rail/shared-types";
+import { PaymentRequestSchema, PolicyUpdateSchema } from "@agent-credit-rail/shared-types";
 import type { AgentCreditAccount } from "@agent-credit-rail/shared-types";
 import { computePurchasingPower } from "@agent-credit-rail/credit-engine";
 import type { Store } from "./store.js";
@@ -101,6 +101,27 @@ export function createOrchestratorApp(store: Store, settler: PaymentSettler) {
 
     const policy = store.getPolicy(agentId);
     return c.json({ policy: policy ?? { agent_id: agentId, services: [] } });
+  });
+
+  /**
+   * PUT /policy/:agentId → upsert policy rules for an agent
+   */
+  app.put("/policy/:agentId", async (c) => {
+    const agentId = c.req.param("agentId");
+    const agent = store.getAgent(agentId);
+    if (!agent) {
+      return c.json({ error: "Agent not found" }, 404);
+    }
+
+    const raw = await c.req.json();
+    const parsed = PolicyUpdateSchema.safeParse(raw);
+    if (!parsed.success) {
+      return c.json({ error: "Invalid policy", details: parsed.error.issues }, 400);
+    }
+
+    const policy = { agent_id: agentId, services: parsed.data.services };
+    store.createPolicy(policy);
+    return c.json({ policy });
   });
 
   /**

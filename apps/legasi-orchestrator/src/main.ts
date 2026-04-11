@@ -1,6 +1,6 @@
 import { serve } from "@hono/node-server";
 import dotenv from "dotenv";
-import { createDemoStore } from "./store.js";
+import { createSeededStore } from "./store.js";
 import { createOrchestratorApp } from "./routes.js";
 import type { PaymentSettler } from "./submission.js";
 import { createX402Settler } from "./x402-settler.js";
@@ -25,7 +25,7 @@ function createSettler(): PaymentSettler {
   };
 }
 
-const store = createDemoStore();
+const store = createSeededStore();
 const settler = createSettler();
 const app = createOrchestratorApp(store, settler);
 
