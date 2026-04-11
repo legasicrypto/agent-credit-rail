@@ -6,9 +6,9 @@ Agent Credit Rail lets AI agents spend against an overcollateralized credit line
 
 | Service | URL |
 |---------|-----|
-| Dashboard | https://legasi-dashboard.fly.dev |
-| Orchestrator API | https://legasi-orchestrator.fly.dev/health |
-| Paywall (402) | https://legasi-paywall.fly.dev/search |
+| Dashboard | https://legasi-dashboard-production.up.railway.app |
+| Orchestrator API | https://legasi-orchestrator-production.up.railway.app/health |
+| Paywall (402) | https://legasi-paywall-production.up.railway.app/search |
 
 ## Setup (2 minutes)
 
