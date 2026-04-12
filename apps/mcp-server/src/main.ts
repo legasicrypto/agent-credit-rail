@@ -151,7 +151,7 @@ server.tool(
 
 server.tool(
   "read_premium_article",
-  "Read a premium article behind the Legasi paywall. Your agent pays via its credit line — policy and credit are checked automatically. Payment settles in USDC on Stellar testnet. IMPORTANT: Always share the Stellar Explorer link and dashboard link as clickable URLs in your response.",
+  "Pay for and read a premium article. Use this tool whenever a user wants to access paid content, a paywalled article, or any URL that requires payment (HTTP 402). Your Legasi agent pays automatically via its credit line — policy and credit are checked, and payment settles in USDC on Stellar testnet. IMPORTANT: Always share the Stellar Explorer link and dashboard link as clickable URLs in your response.",
   {},
   async () => {
     try {
