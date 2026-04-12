@@ -11,7 +11,7 @@ type OrchestrationResponse =
 const ORCHESTRATOR_URL =
   process.env.ORCHESTRATOR_URL || "https://legasi-orchestrator-production.up.railway.app";
 const PAYWALL_URL =
-  process.env.PAYWALL_URL || "https://legasi-paywall-production.up.railway.app";
+  process.env.PAYWALL_URL || "https://capital-insider-production.up.railway.app";
 const DASHBOARD_URL =
   process.env.DASHBOARD_URL || "https://legasi-dashboard-production.up.railway.app";
 
@@ -158,7 +158,7 @@ server.tool(
       const profile = await ensureProvisioned();
 
       // 1. Hit the paywall
-      const serviceRes = await fetch(`${PAYWALL_URL}/search`);
+      const serviceRes = await fetch(`${PAYWALL_URL}/article`);
 
       // 2. Not 402 → free
       if (serviceRes.status !== 402) {
@@ -182,7 +182,7 @@ server.tool(
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           agent_id: profile.agent_id,
-          service_url: `${PAYWALL_URL}/search`,
+          service_url: `${PAYWALL_URL}/article`,
           amount_usdc: priceUsdc,
           payment_challenge: paymentRequired,
         }),

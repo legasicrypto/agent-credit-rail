@@ -50,7 +50,7 @@ describe("AgentClient", () => {
     };
 
     const client = new AgentClient({ agentId: "agent-1" }, fetcher);
-    const result = await client.requestService("/search");
+    const result = await client.requestService("/article");
 
     expect(result.outcome).toBe("settled");
     expect(result.challenge).toBeDefined();

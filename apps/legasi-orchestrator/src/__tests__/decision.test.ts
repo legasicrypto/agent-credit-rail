@@ -10,7 +10,7 @@ describe("evaluatePaymentRequest", () => {
   it("approves allowlisted service with sufficient power", () => {
     const store = makeSeededStore();
     const result = evaluatePaymentRequest(
-      { agent_id: "agent-1", service_url: "/search", amount_usdc: 10 },
+      { agent_id: "agent-1", service_url: "/article", amount_usdc: 10 },
       store,
     );
 
@@ -51,7 +51,7 @@ describe("evaluatePaymentRequest", () => {
     const store = makeSeededStore();
     // Request more than 600 USDC purchasing power
     const result = evaluatePaymentRequest(
-      { agent_id: "agent-1", service_url: "/search", amount_usdc: 700 },
+      { agent_id: "agent-1", service_url: "/article", amount_usdc: 700 },
       store,
     );
 
@@ -62,7 +62,7 @@ describe("evaluatePaymentRequest", () => {
     store2.createAttempt({
       attempt_id: "prior-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 95,
       status: "settled",
       created_at: 1,
@@ -71,7 +71,7 @@ describe("evaluatePaymentRequest", () => {
       kind: "settled",
       attempt_id: "prior-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 95,
       tx_hash: "tx-prior",
       created_at: 1,
@@ -81,7 +81,7 @@ describe("evaluatePaymentRequest", () => {
       store2.createAttempt({
         attempt_id: `prior-${i}`,
         agent_id: "agent-1",
-        service_url: "/search",
+        service_url: "/article",
         amount_usdc: 95,
         status: "settled",
         created_at: i,
@@ -90,7 +90,7 @@ describe("evaluatePaymentRequest", () => {
         kind: "settled",
         attempt_id: `prior-${i}`,
         agent_id: "agent-1",
-        service_url: "/search",
+        service_url: "/article",
         amount_usdc: 95,
         tx_hash: `tx-prior-${i}`,
         created_at: i,
@@ -100,7 +100,7 @@ describe("evaluatePaymentRequest", () => {
     expect(store2.getAgentUsedPower("agent-1")).toBe(570);
 
     const result2 = evaluatePaymentRequest(
-      { agent_id: "agent-1", service_url: "/search", amount_usdc: 50 },
+      { agent_id: "agent-1", service_url: "/article", amount_usdc: 50 },
       store2,
     );
     expect(result2.status).toBe("blocked");
@@ -112,14 +112,14 @@ describe("evaluatePaymentRequest", () => {
     const store = makeSeededStore();
 
     const r1 = evaluatePaymentRequest(
-      { agent_id: "agent-1", service_url: "/search", amount_usdc: 50 },
+      { agent_id: "agent-1", service_url: "/article", amount_usdc: 50 },
       store,
     );
     expect(r1.status).toBe("pending");
 
     // Second request also sees 0 used_power — no reservation
     const r2 = evaluatePaymentRequest(
-      { agent_id: "agent-1", service_url: "/search", amount_usdc: 50 },
+      { agent_id: "agent-1", service_url: "/article", amount_usdc: 50 },
       store,
     );
     expect(r2.status).toBe("pending");
@@ -143,7 +143,7 @@ describe("evaluatePaymentRequest", () => {
     const store = makeSeededStore();
 
     evaluatePaymentRequest(
-      { agent_id: "agent-1", service_url: "/search", amount_usdc: 50 },
+      { agent_id: "agent-1", service_url: "/article", amount_usdc: 50 },
       store,
     );
 

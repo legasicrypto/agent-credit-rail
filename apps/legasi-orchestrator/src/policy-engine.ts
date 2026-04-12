@@ -16,7 +16,7 @@ export function evaluateServicePolicy(
   dailySpend: number,
 ): PolicyResult {
   // Match by exact service_url or by URL path suffix.
-  // Policy stores paths like "/search", real requests use full URLs like "http://host/search".
+  // Policy stores paths like "/article", real requests use full URLs like "http://host/article".
   const rule = policy.services.find(
     (s) => s.service_url === serviceUrl || serviceUrl.endsWith(s.service_url),
   );

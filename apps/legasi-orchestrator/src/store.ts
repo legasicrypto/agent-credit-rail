@@ -137,7 +137,7 @@ export function createSeededStore(): Store {
     agent_id: "agent-1",
     services: [
       {
-        service_url: "/search",
+        service_url: "/article",
         allowed: true,
         per_request_cap_usdc: 100,
         daily_cap_usdc: 500,
@@ -161,7 +161,7 @@ export function createSeededStore(): Store {
         daily_cap_usdc: 150,
       },
       {
-        service_url: "/search",
+        service_url: "/article",
         allowed: true,
         per_request_cap_usdc: 20,
         daily_cap_usdc: 60,
@@ -184,7 +184,7 @@ export function createDemoStore(): Store {
   store.createAttempt({
     attempt_id: "seed-att-1",
     agent_id: "agent-1",
-    service_url: "/search",
+    service_url: "/article",
     amount_usdc: 10,
     status: "settled",
     created_at: now - 300_000,
@@ -193,7 +193,7 @@ export function createDemoStore(): Store {
     kind: "settled",
     attempt_id: "seed-att-1",
     agent_id: "agent-1",
-    service_url: "/search",
+    service_url: "/article",
     amount_usdc: 10,
     tx_hash: "seed-tx-abc123def456",
     created_at: now - 300_000,

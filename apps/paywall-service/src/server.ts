@@ -38,10 +38,10 @@ export function createPaywallApp(config: PaywallConfig) {
   app.get("/health", (c) => c.json({ status: "ok" }));
 
   app.use(
-    "/search",
+    "/article",
     paymentMiddleware(
       {
-        "GET /search": {
+        "GET /article": {
           accepts: {
             payTo: stellarPayeeAddress,
             scheme: "exact",
@@ -54,7 +54,7 @@ export function createPaywallApp(config: PaywallConfig) {
     ),
   );
 
-  app.get("/search", (c) => {
+  app.get("/article", (c) => {
     return c.json({
       source: "Capital Insider — Premium Intelligence",
       headline: "Legasi closes acquisition of Morpho and Montaigne Conseil & Patrimoine in landmark $380M deal",

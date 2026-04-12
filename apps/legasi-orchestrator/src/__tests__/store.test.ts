@@ -51,7 +51,7 @@ describe("Store — payment attempts", () => {
     const attempt: PaymentAttempt = {
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       status: "pending",
       created_at: 1000,
@@ -68,7 +68,7 @@ describe("Store — payment events", () => {
     store.createAttempt({
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       status: "pending",
       created_at: clock(),
@@ -77,7 +77,7 @@ describe("Store — payment events", () => {
       kind: "settled",
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       tx_hash: "tx-abc",
       created_at: clock(),
@@ -120,7 +120,7 @@ describe("Store — payment events", () => {
     store.createAttempt({
       attempt_id: "att-3",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       status: "pending",
       created_at: clock(),
@@ -129,7 +129,7 @@ describe("Store — payment events", () => {
       kind: "failed",
       attempt_id: "att-3",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       error: "submission timeout",
       created_at: clock(),
@@ -150,7 +150,7 @@ describe("Store — queries", () => {
     store.createAttempt({
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       status: "pending",
       created_at: t1,
@@ -160,7 +160,7 @@ describe("Store — queries", () => {
       kind: "settled",
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       tx_hash: "tx-1",
       created_at: t2,
@@ -199,7 +199,7 @@ describe("Store — queries", () => {
     store.createAttempt({
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       status: "settled",
       created_at: clock(),
@@ -208,7 +208,7 @@ describe("Store — queries", () => {
       kind: "settled",
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       tx_hash: "tx-1",
       created_at: clock(),
@@ -237,7 +237,7 @@ describe("Store — queries", () => {
     store.createAttempt({
       attempt_id: "att-3",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 20,
       status: "failed",
       created_at: clock(),
@@ -246,7 +246,7 @@ describe("Store — queries", () => {
       kind: "failed",
       attempt_id: "att-3",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 20,
       error: "timeout",
       created_at: clock(),
@@ -262,7 +262,7 @@ describe("Store — queries", () => {
     store.createAttempt({
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 100,
       status: "blocked",
       created_at: clock(),
@@ -271,7 +271,7 @@ describe("Store — queries", () => {
       kind: "blocked",
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 100,
       reason: "INSUFFICIENT_POWER",
       created_at: clock(),
@@ -287,7 +287,7 @@ describe("Store — queries", () => {
     store.createAttempt({
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       status: "pending",
       created_at: clock(),
@@ -296,7 +296,7 @@ describe("Store — queries", () => {
       kind: "settled",
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       tx_hash: "tx-abc",
       created_at: clock(),
@@ -331,7 +331,7 @@ describe("Store — seed data", () => {
     expect(policy).toBeDefined();
 
     // Allowlisted service
-    const searchRule = policy!.services.find((s) => s.service_url === "/search");
+    const searchRule = policy!.services.find((s) => s.service_url === "/article");
     expect(searchRule).toBeDefined();
     expect(searchRule!.allowed).toBe(true);
   });

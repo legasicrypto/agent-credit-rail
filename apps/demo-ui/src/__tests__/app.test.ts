@@ -50,7 +50,7 @@ describe("demo-ui API contract", () => {
       kind: "settled",
       attempt_id: "att-1",
       agent_id: "agent-1",
-      service_url: "/search",
+      service_url: "/article",
       amount_usdc: 10,
       tx_hash: "tx-abc",
       created_at: 1000,

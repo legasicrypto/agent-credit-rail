@@ -58,8 +58,8 @@ describe.skipIf(missingEnv)("smoke: real x402 settle-and-unlock on Stellar testn
     };
   });
 
-  it("GET /search without payment returns 402 with x402 challenge", async () => {
-    const res = await fetch(`${paywallUrl}/search`);
+  it("GET /article without payment returns 402 with x402 challenge", async () => {
+    const res = await fetch(`${paywallUrl}/article`);
     expect(res.status).toBe(402);
 
     const paymentHeader = res.headers.get("payment-required");
@@ -79,7 +79,7 @@ describe.skipIf(missingEnv)("smoke: real x402 settle-and-unlock on Stellar testn
 
   it("full settle-and-unlock: 402 → credit check → x402 payment → Stellar settlement → unlock", async () => {
     // 1. Hit the paywall — get 402 challenge
-    const paywallRes = await fetch(`${paywallUrl}/search`);
+    const paywallRes = await fetch(`${paywallUrl}/article`);
     expect(paywallRes.status).toBe(402);
 
     const paymentHeader = paywallRes.headers.get("payment-required");
@@ -99,7 +99,7 @@ describe.skipIf(missingEnv)("smoke: real x402 settle-and-unlock on Stellar testn
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         agent_id: "agent-1",
-        service_url: `${paywallUrl}/search`,
+        service_url: `${paywallUrl}/article`,
         amount_usdc: priceUsdc,
         payment_challenge: challenge,
       }),

@@ -39,7 +39,7 @@ export function createOrchestratorApp(store: Store, settler: PaymentSettler) {
     const policy = {
       agent_id: agentId,
       services: [
-        { service_url: "/search", allowed: true, per_request_cap_usdc: 100, daily_cap_usdc: 500 },
+        { service_url: "/article", allowed: true, per_request_cap_usdc: 100, daily_cap_usdc: 500 },
         { service_url: "unknown-api.xyz", allowed: false, per_request_cap_usdc: 0, daily_cap_usdc: 0 },
       ],
     };

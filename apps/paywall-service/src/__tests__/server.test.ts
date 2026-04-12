@@ -14,13 +14,13 @@ describe("paywall-service", () => {
     expect(body.status).toBe("ok");
   });
 
-  it("GET /search without payment returns 402", async () => {
-    const res = await app.request("/search");
+  it("GET /article without payment returns 402", async () => {
+    const res = await app.request("/article");
     expect(res.status).toBe(402);
   });
 
   it("402 response includes x402 payment-required header", async () => {
-    const res = await app.request("/search");
+    const res = await app.request("/article");
     expect(res.status).toBe(402);
     // x402 returns payment requirements as a header or in the body
     // The exact header name is PAYMENT-REQUIRED (base64-encoded PaymentRequired object)
@@ -29,7 +29,7 @@ describe("paywall-service", () => {
   });
 
   it("402 challenge references Stellar network", async () => {
-    const res = await app.request("/search");
+    const res = await app.request("/article");
     const paymentHeader = res.headers.get("payment-required");
     expect(paymentHeader).toBeTruthy();
     // Decode the base64 header to inspect the challenge

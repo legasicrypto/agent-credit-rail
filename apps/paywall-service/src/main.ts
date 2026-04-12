@@ -22,6 +22,6 @@ const app = createPaywallApp({
 
 serve({ fetch: app.fetch, port: PORT, hostname: "0.0.0.0" }, () => {
   console.log(`Paywall service running on http://localhost:${PORT}`);
-  console.log(`  GET /search  → 402 (requires Stellar payment)`);
+  console.log(`  GET /article  → 402 (requires Stellar payment)`);
   console.log(`  GET /health  → 200`);
 });

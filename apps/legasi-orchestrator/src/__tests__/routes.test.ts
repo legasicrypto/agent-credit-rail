@@ -27,7 +27,7 @@ describe("orchestrator routes", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         agent_id: "agent-1",
-        service_url: "/search",
+        service_url: "/article",
         amount_usdc: 10,
       }),
     });
@@ -86,7 +86,7 @@ describe("orchestrator routes", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         agent_id: "agent-1",
-        service_url: "/search",
+        service_url: "/article",
         amount_usdc: 50,
       }),
     });
@@ -106,7 +106,7 @@ describe("orchestrator routes", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         agent_id: "agent-1",
-        service_url: "/search",
+        service_url: "/article",
         amount_usdc: 10,
       }),
     });
@@ -249,7 +249,7 @@ describe("orchestrator routes", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         agent_id,
-        service_url: "/search",
+        service_url: "/article",
         amount_usdc: 10,
       }),
     });

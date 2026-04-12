@@ -8,7 +8,7 @@ Agent Credit Rail lets AI agents spend against an overcollateralized credit line
 |---------|-----|
 | Dashboard | https://legasi-dashboard-production.up.railway.app |
 | Orchestrator API | https://legasi-orchestrator-production.up.railway.app/health |
-| Paywall (402) | https://legasi-paywall-production.up.railway.app/search |
+| Paywall (402) | https://capital-insider-production.up.railway.app/article |
 
 ## Setup (1 minute)
 
@@ -54,7 +54,7 @@ Watch the payment settle in real time on Stellar testnet. Click the Stellar Expl
 
 ### 5. Test policy enforcement (blocked flow)
 
-Open your dashboard link, click **Edit** on Policy Rules, toggle `/search` to **DENIED**, save. Then:
+Open your dashboard link, click **Edit** on Policy Rules, toggle `/article` to **DENIED**, save. Then:
 
 > Read the premium article again.
 

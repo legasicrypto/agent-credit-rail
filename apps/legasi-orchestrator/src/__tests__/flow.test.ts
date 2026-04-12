@@ -17,7 +17,7 @@ describe("submission flow", () => {
   it("approved attempt + successful submission → used_power increases, settled event", async () => {
     const store = createSeededStore();
     const decision = evaluatePaymentRequest(
-      { agent_id: "agent-1", service_url: "/search", amount_usdc: 10 },
+      { agent_id: "agent-1", service_url: "/article", amount_usdc: 10 },
       store,
     );
     expect(decision.status).toBe("pending");
@@ -48,7 +48,7 @@ describe("submission flow", () => {
   it("approved attempt + submission failure → used_power unchanged, failed event", async () => {
     const store = createSeededStore();
     const decision = evaluatePaymentRequest(
-      { agent_id: "agent-1", service_url: "/search", amount_usdc: 10 },
+      { agent_id: "agent-1", service_url: "/article", amount_usdc: 10 },
       store,
     );
     expect(decision.status).toBe("pending");
@@ -79,7 +79,7 @@ describe("submission flow", () => {
 
     // Decision
     const decision = evaluatePaymentRequest(
-      { agent_id: "agent-1", service_url: "/search", amount_usdc: 25 },
+      { agent_id: "agent-1", service_url: "/article", amount_usdc: 25 },
       store,
     );
     expect(decision.status).toBe("pending");
