@@ -7,7 +7,7 @@ export function HeroBanner() {
         </span>
       </h1>
       <p className="text-xl font-semibold text-gray-700 mb-3">
-        Company Credit Cards for AI Agents
+        Corporate Credit Cards for AI Agents
       </p>
       <p className="text-gray-500 max-w-xl mx-auto mb-10">
         Post collateral. Set spending rules. Let your agents pay autonomously

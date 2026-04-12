@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-Agent Credit Rail is Legasi's hackathon MVP for policy-controlled agent payments on Stellar testnet. The core model: an owner posts collateral, Legasi computes an overcollateralized credit line (collateral × LTV), and agents spend against that credit line for approved x402 services only. Think "company credit card for AI agents" — the agent never receives unrestricted funds.
+Agent Credit Rail is Legasi's hackathon MVP for policy-controlled agent payments on Stellar testnet. The core model: an owner posts collateral, Legasi computes an overcollateralized credit line (collateral × LTV), and agents spend against that credit line for approved x402 services only. Think "corporate credit card for AI agents" — the agent never receives unrestricted funds.
 
 ## Build and development commands
 

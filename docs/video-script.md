@@ -12,7 +12,7 @@ Target: 3-5 minutes. Lead with the product, not the protocol.
 
 ## 2. The Product (45s)
 
-"Agent Credit Rail is a company credit card for AI agents."
+"Agent Credit Rail is a corporate credit card for AI agents."
 
 Show the UI dashboard:
 

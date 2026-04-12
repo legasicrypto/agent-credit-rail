@@ -34,7 +34,7 @@ An owner funds an overcollateralized credit line for an agent, the agent tries t
 
 ### Opening
 
-"This is a company credit card model for agents. The owner posts collateral, Legasi converts that collateral into an overcollateralized credit line, and the owner defines where the agent is allowed to spend. The agent can buy approved services, but it does not control the treasury account."
+"This is a corporate credit card model for agents. The owner posts collateral, Legasi converts that collateral into an overcollateralized credit line, and the owner defines where the agent is allowed to spend. The agent can buy approved services, but it does not control the treasury account."
 
 ### Approved spend
 

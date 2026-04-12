@@ -13,7 +13,7 @@ Legasi's long-term direction is permissioned digital credit infrastructure. For 
 - the paid service unlocks
 - Legasi records usage and blocked attempts
 
-The core product analogy is a company credit card for agents:
+The core product analogy is a corporate credit card for agents:
 
 - the owner controls treasury and policy
 - the agent can spend only within rules

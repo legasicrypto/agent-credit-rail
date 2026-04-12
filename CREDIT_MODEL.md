@@ -71,7 +71,7 @@ available_power_usdc = 550
 
 ## Why the agent should not hold the borrowed funds directly
 
-The product is designed to work like a company credit card:
+The product is designed to work like a corporate credit card:
 
 - the company employee can spend company money
 - but the employee does not control the company's bank account
