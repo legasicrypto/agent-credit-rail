@@ -57,9 +57,9 @@ Open the link — you'll see the payment in the **Transaction Feed**, the credit
 
 ### 4. Test policy enforcement (blocked flow)
 
-> Can you access unknown-api.xyz for me?
+> Can you buy me the latest dataset from premium-data.io?
 
-The payment is **blocked** — unknown-api.xyz is not allowlisted. AgentPay never lets the agent spend outside its policy.
+The payment is **blocked** — premium-data.io is not on the approved services list. AgentPay never lets the agent spend outside its policy. No money moved.
 
 ### 5. Edit the policy live
 

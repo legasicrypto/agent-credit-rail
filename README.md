@@ -21,7 +21,7 @@ An AI agent requests a paid HTTP service. The service returns `402 Payment Requi
 
 **Two demo flows:**
 1. **Approved**: agent requests allowlisted `/search` → 402 → policy + credit check passes → Legasi settles USDC payment on Stellar → service returns result → spend logged
-2. **Blocked**: agent requests `unknown-api.xyz` (synthetic) → policy rejects → blocked event logged → power unchanged
+2. **Blocked**: agent requests `premium-data.io` (synthetic) → policy rejects → blocked event logged → power unchanged
 
 ## The credit model
 
@@ -69,7 +69,7 @@ curl -X POST http://localhost:4010/payment/request \
 # Make a payment (blocked flow)
 curl -X POST http://localhost:4010/payment/request \
   -H "Content-Type: application/json" \
-  -d '{"agent_id":"agent-1","service_url":"unknown-api.xyz","amount_usdc":10}'
+  -d '{"agent_id":"agent-1","service_url":"premium-data.io","amount_usdc":10}'
 
 # View payment history
 curl http://localhost:4010/payments/agent-1
@@ -88,7 +88,7 @@ curl -i http://localhost:4020/search
 | Purchasing power | 600 USDC |
 | Payment asset | USDC (Stellar testnet) |
 | Allowlisted service | `/search` (cap: 100/request, 500/day) |
-| Blocked service | `unknown-api.xyz` (synthetic, not a real service) |
+| Blocked service | `premium-data.io` (synthetic, not a real service) |
 
 ## What is real vs mocked
 

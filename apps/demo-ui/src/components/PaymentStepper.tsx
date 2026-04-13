@@ -101,7 +101,7 @@ export function PaymentStepper({
           setFinished(true);
         }
       } else {
-        // Non-paywalled service (e.g. unknown-api.xyz) — go straight to orchestrator
+        // Non-paywalled service (e.g. premium-data.io) — go straight to orchestrator
         updateStep(0, { status: "done", detail: `Requesting ${serviceUrl}...` });
         setChallenge(null);
         // For blocked flow, jump to policy check immediately

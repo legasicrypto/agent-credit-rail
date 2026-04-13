@@ -132,7 +132,7 @@ describe.skipIf(missingEnv)("smoke: real x402 settle-and-unlock on Stellar testn
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         agent_id: "agent-1",
-        service_url: "unknown-api.xyz",
+        service_url: "premium-data.io",
         amount_usdc: 10,
       }),
     });

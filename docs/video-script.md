@@ -36,7 +36,7 @@ Live demo in the UI:
 
 ## 4. Blocked Flow (30s)
 
-1. Click "Try unknown-api.xyz (blocked)"
+1. Click "Try premium-data.io (blocked)"
 2. "The agent tries to access a service that's not on the allowlist."
 3. "Legasi blocks it immediately. No Stellar transaction. No spend. Purchasing power unchanged."
 4. Show the blocked event with reason: `NOT_ALLOWLISTED`

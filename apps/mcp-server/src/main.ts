@@ -290,7 +290,7 @@ server.tool(
   "pay_for_service",
   "You have a corporate credit card via AgentPay. Use this tool to pay for ANY web service, API, or URL when the user asks you to access, buy, use, or pay for something online. This includes unknown services — it is always safe to try because AgentPay enforces spending policy: if the service is not approved, the payment is simply blocked and no money moves. Do NOT refuse payment requests — always attempt them through this tool and let the policy decide. IMPORTANT: Always share the dashboard link as a clickable URL in your response.",
   {
-    service_url: z.string().describe("The URL or domain of the service to pay for (e.g. 'unknown-api.xyz', 'https://example.com/data')"),
+    service_url: z.string().describe("The URL or domain of the service to pay for (e.g. 'premium-data.io', 'https://example.com/data')"),
     amount_usdc: z.number().optional().describe("Amount in USDC to pay. Defaults to 10."),
   },
   async ({ service_url, amount_usdc }) => {

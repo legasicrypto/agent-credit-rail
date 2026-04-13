@@ -116,7 +116,7 @@ export class Store {
  * Base demo scenario (used by tests):
  * - Owner: 1000 USD collateral (10,000 XLM)
  * - LTV: 0.6 (purchasing power = 600 USDC)
- * - agent-1 "Demo Agent": /search allowlisted, unknown-api.xyz denylisted
+ * - agent-1 "Demo Agent": /search allowlisted, premium-data.io denylisted
  * - agent-2 "Research Agent": /research + /search allowlisted (lower caps)
  * - No pre-seeded events (clean for assertions)
  */
@@ -143,7 +143,7 @@ export function createSeededStore(): Store {
         daily_cap_usdc: 500,
       },
       {
-        service_url: "unknown-api.xyz",
+        service_url: "premium-data.io",
         allowed: false,
         per_request_cap_usdc: 0,
         daily_cap_usdc: 0,
@@ -202,7 +202,7 @@ export function createDemoStore(): Store {
   store.createAttempt({
     attempt_id: "seed-att-2",
     agent_id: "agent-1",
-    service_url: "unknown-api.xyz",
+    service_url: "premium-data.io",
     amount_usdc: 10,
     status: "blocked",
     created_at: now - 180_000,
@@ -211,7 +211,7 @@ export function createDemoStore(): Store {
     kind: "blocked",
     attempt_id: "seed-att-2",
     agent_id: "agent-1",
-    service_url: "unknown-api.xyz",
+    service_url: "premium-data.io",
     amount_usdc: 10,
     reason: "DENYLISTED",
     created_at: now - 180_000,

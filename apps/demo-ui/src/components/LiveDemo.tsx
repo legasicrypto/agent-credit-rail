@@ -49,15 +49,15 @@ export function LiveDemo({ allowedRules, agentId, paywallUrl, apiUrl, onRefresh 
           ))}
           <button
             onClick={() =>
-              setActiveStepper({ serviceUrl: "unknown-api.xyz", amount: 10 })
+              setActiveStepper({ serviceUrl: "premium-data.io", amount: 10 })
             }
             className="group relative px-5 py-3 bg-white border border-red-100 rounded-xl shadow-sm hover:shadow-md hover:border-red-300 transition-all cursor-pointer"
           >
             <div className="text-sm font-semibold text-red-600">
-              Try unauthorized service
+              Buy data from premium-data.io
             </div>
             <div className="text-xs text-red-300 mt-0.5">
-              Will be blocked by policy
+              Not on approved list — will be blocked
             </div>
           </button>
         </div>

@@ -40,7 +40,7 @@ export function createOrchestratorApp(store: Store, settler: PaymentSettler) {
       agent_id: agentId,
       services: [
         { service_url: "/article", allowed: true, per_request_cap_usdc: 100, daily_cap_usdc: 500 },
-        { service_url: "unknown-api.xyz", allowed: false, per_request_cap_usdc: 0, daily_cap_usdc: 0 },
+        { service_url: "premium-data.io", allowed: false, per_request_cap_usdc: 0, daily_cap_usdc: 0 },
       ],
     };
     store.createPolicy(policy);

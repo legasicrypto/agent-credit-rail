@@ -64,7 +64,7 @@ describe("demo-ui API contract", () => {
       kind: "blocked",
       attempt_id: "att-2",
       agent_id: "agent-1",
-      service_url: "unknown-api.xyz",
+      service_url: "premium-data.io",
       amount_usdc: 10,
       reason: "NOT_ALLOWLISTED",
       created_at: 1000,
