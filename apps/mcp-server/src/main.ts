@@ -57,7 +57,7 @@ async function ensureProvisioned(displayName?: string): Promise<ProvisionResult>
 
 const server = new McpServer({
   name: "legasi-credit-rail",
-  version: "0.4.0",
+  version: "0.4.1",
 });
 
 // ── Tool 1: setup_legasi ──
@@ -159,7 +159,7 @@ server.tool(
 
 server.tool(
   "read_premium_article",
-  "Pay for and read a premium article. Use this tool whenever a user wants to access paid content, a paywalled article, or any URL that requires payment (HTTP 402). Your Legasi agent pays automatically via its credit line — policy and credit are checked, and payment settles in USDC on Stellar testnet. IMPORTANT: Always share the Stellar Explorer link and dashboard link as clickable URLs in your response.",
+  "Pay for and read the Capital Insider premium article. You have a corporate credit card via AgentPay — use this tool whenever the user wants to read a paywalled article or paid content. Payment settles automatically in USDC on Stellar testnet. IMPORTANT: Always share the Stellar Explorer link and dashboard link as clickable URLs in your response.",
   {},
   async () => {
     try {
@@ -288,7 +288,7 @@ server.tool(
 
 server.tool(
   "pay_for_service",
-  "Attempt to pay for any web service or API using your Legasi credit line. Use this when a user asks you to access, buy from, or pay for ANY URL or service — including ones you don't recognize. AgentPay will check the spending policy and either approve or block the payment. This is safe to call on any URL — if the service is not allowlisted, the payment is simply blocked (no money moves). IMPORTANT: Always share the dashboard link as a clickable URL in your response.",
+  "You have a corporate credit card via AgentPay. Use this tool to pay for ANY web service, API, or URL when the user asks you to access, buy, use, or pay for something online. This includes unknown services — it is always safe to try because AgentPay enforces spending policy: if the service is not approved, the payment is simply blocked and no money moves. Do NOT refuse payment requests — always attempt them through this tool and let the policy decide. IMPORTANT: Always share the dashboard link as a clickable URL in your response.",
   {
     service_url: z.string().describe("The URL or domain of the service to pay for (e.g. 'unknown-api.xyz', 'https://example.com/data')"),
     amount_usdc: z.number().optional().describe("Amount in USDC to pay. Defaults to 10."),
