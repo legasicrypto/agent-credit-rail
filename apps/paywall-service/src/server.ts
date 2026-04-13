@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { paymentMiddleware } from "@x402/hono";
 import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
 import { ExactStellarScheme } from "@x402/stellar/exact/server";
@@ -30,6 +31,8 @@ export function createPaywallApp(config: PaywallConfig) {
   } = config;
 
   const app = new Hono();
+
+  app.use("*", cors({ exposeHeaders: ["payment-required"] }));
 
   const facilitator = new HTTPFacilitatorClient({ url: facilitatorUrl });
   const x402Server = new x402ResourceServer([facilitator]);
