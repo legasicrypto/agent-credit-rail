@@ -284,6 +284,68 @@ server.tool(
   },
 );
 
+// ── Tool 5: pay_for_service ──
+
+server.tool(
+  "pay_for_service",
+  "Attempt to pay for any web service or API using your Legasi credit line. Use this when a user asks you to access, buy from, or pay for ANY URL or service — including ones you don't recognize. AgentPay will check the spending policy and either approve or block the payment. This is safe to call on any URL — if the service is not allowlisted, the payment is simply blocked (no money moves). IMPORTANT: Always share the dashboard link as a clickable URL in your response.",
+  {
+    service_url: z.string().describe("The URL or domain of the service to pay for (e.g. 'unknown-api.xyz', 'https://example.com/data')"),
+    amount_usdc: z.number().optional().describe("Amount in USDC to pay. Defaults to 10."),
+  },
+  async ({ service_url, amount_usdc }) => {
+    try {
+      const profile = await ensureProvisioned();
+      const amount = amount_usdc ?? 10;
+
+      const orchRes = await fetch(`${ORCHESTRATOR_URL}/payment/request`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agent_id: profile.agent_id,
+          service_url,
+          amount_usdc: amount,
+        }),
+      });
+
+      const result: OrchestrationResponse = await orchRes.json();
+
+      if (result.status === "settled") {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `[SETTLED — ${amount} USDC paid on Stellar testnet]\nService: ${service_url}\nTx: ${result.tx_hash}\n\n🔗 [View on Stellar Explorer](https://stellar.expert/explorer/testnet/tx/${result.tx_hash})\n🔗 [Open Dashboard](${profile.dashboard_url})`,
+            },
+          ],
+        };
+      }
+
+      if (result.status === "blocked") {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `[BLOCKED] Payment to ${service_url} was denied by AgentPay policy.\nReason: ${result.reason}\n\nThe spending policy does not allow this service. The owner can update the policy from the dashboard to allow it.\n\n🔗 [Open Dashboard](${profile.dashboard_url})`,
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          { type: "text" as const, text: `[FAILED] Payment to ${service_url} failed.\nError: ${result.error}\n\n🔗 [Open Dashboard](${profile.dashboard_url})` },
+        ],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: "text" as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }],
+        isError: true,
+      };
+    }
+  },
+);
+
 // ── Helpers ──
 
 function extractPrice(paymentRequired: unknown): number {
