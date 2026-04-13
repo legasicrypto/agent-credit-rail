@@ -32,7 +32,7 @@ export function AgentSelector({ agents, selectedId, onSelect, editingPolicy }: P
             }`}
           >
             {agent.name}
-            <span className={`block text-xs mt-0.5 ${active ? "text-blue-100" : "text-gray-400"}`}>
+            <span className={`block text-xs mt-0.5 ${active ? "text-orange-100" : "text-gray-400"}`}>
               {agent.id}
             </span>
           </button>

@@ -274,7 +274,7 @@ export function PaymentStepper({
           disabled={!canAdvance && !finished}
           className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
             canAdvance || finished
-              ? "bg-brand-blue text-white hover:bg-blue-600 shadow-sm"
+              ? "bg-brand-blue text-white hover:bg-orange-600 shadow-sm"
               : "bg-gray-100 text-gray-400 cursor-not-allowed"
           }`}
         >
@@ -299,7 +299,7 @@ function StepIcon({ status, index }: { status: StepStatus; index: number }) {
       return <div className={`${base} bg-emerald-100 text-emerald-600`}>&#10003;</div>;
     case "running":
       return (
-        <div className={`${base} bg-blue-100 text-brand-blue`}>
+        <div className={`${base} bg-orange-100 text-brand-blue`}>
           <Spinner />
         </div>
       );
