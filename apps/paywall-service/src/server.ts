@@ -105,7 +105,6 @@ const ARTICLE_PAGE_HTML = `<!DOCTYPE html>
     h1 { font-size: 36px; font-weight: 600; line-height: 1.2; margin-bottom: 20px; color: #111; }
     .lead { font-size: 20px; line-height: 1.6; color: #444; margin-bottom: 32px; font-style: italic; }
     .body-text p { font-size: 18px; line-height: 1.8; margin-bottom: 24px; color: #333; }
-    .body-text blockquote { border-left: 3px solid #FF4E00; padding-left: 20px; margin: 32px 0; font-style: italic; color: #555; }
     .paywall-fade { position: relative; }
     .paywall-fade::after {
       content: '';
@@ -117,29 +116,21 @@ const ARTICLE_PAGE_HTML = `<!DOCTYPE html>
       text-align: center; padding: 48px 24px; margin-top: -40px; position: relative; z-index: 1;
       background: #fafaf8;
     }
-    .paywall-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
-      color: #FF4E00; background: #FFF3EC; border: 1px solid #FFD9C2;
-      padding: 8px 20px; border-radius: 100px; margin-bottom: 20px;
+    .pay-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;
+      color: white; background: #111; border: none;
+      padding: 14px 32px; border-radius: 8px; cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 16px;
     }
-    .paywall-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: #FF4E00; }
-    .paywall-title { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 700; color: #111; margin-bottom: 8px; }
-    .paywall-sub { font-family: 'Inter', sans-serif; font-size: 14px; color: #888; max-width: 460px; margin: 0 auto 24px; line-height: 1.5; }
-    .paywall-info {
-      display: inline-flex; flex-direction: column; gap: 12px; text-align: left;
-      font-family: 'Inter', sans-serif; font-size: 13px; color: #666;
-      background: white; border: 1px solid #e5e5e0; border-radius: 12px;
-      padding: 20px 28px;
+    .pay-btn:hover { background: #333; }
+    .pay-btn svg { width: 16px; height: 16px; }
+    .paywall-sub {
+      font-family: 'Inter', sans-serif; font-size: 13px; color: #999;
+      max-width: 400px; margin: 0 auto; line-height: 1.5;
     }
-    .paywall-info .row { display: flex; align-items: center; gap: 8px; }
-    .paywall-info .label { color: #999; min-width: 80px; }
-    .paywall-info .value { font-weight: 600; color: #333; }
-    .powered {
-      margin-top: 32px; font-family: 'Inter', sans-serif; font-size: 12px; color: #bbb;
-    }
-    .powered a { color: #FF4E00; text-decoration: none; font-weight: 600; }
-    .powered a:hover { text-decoration: underline; }
+    .paywall-sub a { color: #555; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -179,20 +170,12 @@ const ARTICLE_PAGE_HTML = `<!DOCTYPE html>
     </div>
 
     <div class="paywall-overlay">
-      <div class="paywall-badge"><span class="dot"></span> 402 &mdash; Payment Required</div>
-      <div class="paywall-title">This article requires payment</div>
-      <div class="paywall-sub">
-        Access is available to AI agents with a valid credit line through the x402 protocol.
-        Payment settles in USDC on Stellar testnet.
-      </div>
-      <div class="paywall-info">
-        <div class="row"><span class="label">Price</span><span class="value">0.001 USDC</span></div>
-        <div class="row"><span class="label">Network</span><span class="value">Stellar Testnet</span></div>
-        <div class="row"><span class="label">Protocol</span><span class="value">x402</span></div>
-        <div class="row"><span class="label">Endpoint</span><span class="value">GET /article</span></div>
-      </div>
-      <p class="powered">
-        Payments powered by <a href="https://legasi.io" target="_blank">AgentPay by Legasi</a>
+      <button class="pay-btn" onclick="alert('Payment requires an x402-compatible agent. Try asking your AI assistant to read this article.')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Pay $4.99 to read
+      </button>
+      <p class="paywall-sub">
+        Single article access. Payment settles via <a href="https://x402.org" target="_blank">x402</a> on Stellar.
       </p>
     </div>
   </article>
