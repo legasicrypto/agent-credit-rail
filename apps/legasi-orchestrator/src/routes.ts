@@ -94,8 +94,7 @@ export function createOrchestratorApp(store: Store, settler: PaymentSettler) {
       payment_challenge,
     );
 
-    const status = response.status === "settled" ? 200 : 502;
-    return c.json(response, status);
+    return c.json(response, 200);
   });
 
   /**
