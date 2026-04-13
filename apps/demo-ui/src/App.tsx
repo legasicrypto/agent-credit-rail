@@ -44,6 +44,7 @@ interface ServiceRule {
 }
 
 const API = import.meta.env.VITE_API_URL || "/api";
+const PAYWALL_URL = import.meta.env.VITE_PAYWALL_URL || "https://capital-insider-production.up.railway.app";
 
 function getInitialAgentId(): string {
   const params = new URLSearchParams(window.location.search);
@@ -56,7 +57,6 @@ export function App() {
   const [events, setEvents] = useState<PaymentEvent[]>([]);
   const [agents, setAgents] = useState<AgentInfo[]>([]);
   const [policyRules, setPolicyRules] = useState<ServiceRule[]>([]);
-  const [lastAction, setLastAction] = useState<string>("");
   const [editingPolicy, setEditingPolicy] = useState(false);
   const [editRules, setEditRules] = useState<ServiceRule[]>([]);
   const [saving, setSaving] = useState(false);
@@ -91,32 +91,6 @@ export function App() {
     refresh();
   }, [refresh]);
 
-  const sendPayment = async (serviceUrl: string, amount: number) => {
-    setLastAction(`Requesting ${serviceUrl} for ${amount} USDC...`);
-    try {
-      const res = await fetch(`${API}/payment/request`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          agent_id: selectedAgentId,
-          service_url: serviceUrl,
-          amount_usdc: amount,
-        }),
-      });
-      const result = await res.json();
-      setLastAction(
-        result.status === "settled"
-          ? `Settled! tx: ${result.tx_hash}`
-          : result.status === "blocked"
-            ? `Blocked: ${result.reason}`
-            : `Failed: ${result.error}`,
-      );
-      refresh();
-    } catch {
-      setLastAction("Error: orchestrator not reachable");
-    }
-  };
-
   const startEditing = () => {
     setEditRules(policyRules.map((r) => ({ ...r })));
     setEditingPolicy(true);
@@ -146,15 +120,11 @@ export function App() {
         body: JSON.stringify({ services: editRules }),
       });
       if (res.ok) {
-        setLastAction("Policy saved successfully");
         setEditingPolicy(false);
         refresh();
-      } else {
-        const err = await res.json();
-        setLastAction(`Failed to save policy: ${err.error || "Unknown error"}`);
       }
     } catch {
-      setLastAction("Error: orchestrator not reachable");
+      // orchestrator not reachable
     }
     setSaving(false);
   };
@@ -229,8 +199,10 @@ export function App() {
 
       <LiveDemo
         allowedRules={policyRules.filter((r) => r.allowed)}
-        lastAction={lastAction}
-        onSendPayment={sendPayment}
+        agentId={selectedAgentId}
+        paywallUrl={PAYWALL_URL}
+        apiUrl={API}
+        onRefresh={refresh}
       />
 
       <TransactionFeed events={events} />
