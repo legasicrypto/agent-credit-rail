@@ -1,176 +1,174 @@
-# Agent Credit Rail
+AI agents can read, write, code, and deploy. But they still cannot pay.
 
-Policy-controlled agent payments on Stellar, backed by an **overcollateralized credit line** funded by owner-posted collateral.
+The moment agents can transact autonomously, every API becomes a business model. AgentPay lets Claude pay $4.99 for a paywalled article in USDC on Stellar, under a programmable credit policy — no wallet popups, no human approval, no keys exposed.
 
-> **Hackathon**: [Stellar Agents x402](https://dorahacks.io/hackathon/stellar-agents-x402-stripe-mpp/detail) on DoraHacks
+At Legasi, we're building digital credit infrastructure for financial institutions. AgentPay is the first machine-native interface to that credit layer.
 
-## What this proves
+---
 
-An AI agent requests a paid HTTP service. The service returns `402 Payment Required` with an x402 challenge on Stellar testnet. Legasi checks the agent's policy and remaining credit, then settles the USDC payment on Stellar. The agent never receives unrestricted funds — it spends against an overcollateralized credit line backed by XLM collateral.
+# AgentPay
 
-**Canonical proof (Stellar testnet):**
+**Corporate Credit Cards for AI Agents** — by [Legasi](https://legasi.io)
+
+Enable any LLM to pay in USDC on Stellar — with programmable credit limits, policy enforcement, and real on-chain settlement.
+
+> [Stellar Agents x402 Hackathon](https://dorahacks.io/hackathon/stellar-agents-x402-stripe-mpp/detail) on DoraHacks
+
+---
+
+## Proof
+
+This is live. Not a mockup.
 
 | | |
 |---|---|
-| **Tx hash** | `c95f226755d775a1b97dcc38fbb12d38fe6fee2f9e3f50074b78f382b377fa77` |
-| **Explorer** | [View on Stellar Expert](https://stellar.expert/explorer/testnet/tx/c95f226755d775a1b97dcc38fbb12d38fe6fee2f9e3f50074b78f382b377fa77) |
+| **Tx hash** | [`c95f226...b377fa77`](https://stellar.expert/explorer/testnet/tx/c95f226755d775a1b97dcc38fbb12d38fe6fee2f9e3f50074b78f382b377fa77) |
+| **Asset** | USDC on Stellar testnet |
 | **Collateral** | XLM (owner-posted, valued in USD) |
-| **Payment asset** | USDC (Stellar testnet SAC) |
 
-**Why this is not just another x402 demo:** The owner's collateral (XLM) is not the payment asset (USDC). Legasi computes a credit line from collateral, applies policy controls, and settles payments on a separate rail. The service unlocks only after real Stellar settlement. This is the first working layer of credit infrastructure for AI agents — not a wallet, not a proxy, but a controlled spend rail backed by overcollateralized credit.
+Verify on-chain. The payment asset (USDC) is different from the collateral (XLM). This is real credit infrastructure, not a wrapped wallet.
 
-**Two demo flows:**
-1. **Approved**: agent requests allowlisted `/search` → 402 → policy + credit check passes → Legasi settles USDC payment on Stellar → service returns result → spend logged
-2. **Blocked**: agent requests `premium-data.io` (synthetic) → policy rejects → blocked event logged → power unchanged
+**Live now:**
+
+| | |
+|---|---|
+| [Capital Insider](https://capital-insider-production.up.railway.app) | Paywalled publication — try paying as a human |
+| [AgentPay Dashboard](https://legasi-dashboard-production.up.railway.app) | Credit card, policy, transaction feed |
+
+---
+
+## Try it yourself (60 seconds)
+
+Your Claude can autonomously pay for articles, APIs, and digital services. Set it up:
+
+**1.** Open your Claude Desktop config:
+- **Mac**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+**2.** Paste this:
+
+```json
+{
+  "mcpServers": {
+    "legasi-credit-rail": {
+      "command": "npx",
+      "args": ["-y", "legasi-credit-rail"]
+    }
+  }
+}
+```
+
+**3.** Restart Claude Desktop. Then try these prompts:
+
+> Is there any news about Legasi on capital-insider-production.up.railway.app?
+
+Claude finds the article — but it's paywalled.
+
+> Can you pay for it?
+
+Claude pays $4.99 in USDC on Stellar. Article unlocks. Click the Stellar Explorer link to verify.
+
+> Can you buy me the latest dataset from premium-data.io?
+
+**Blocked.** premium-data.io is not on the approved list. No money moved. The policy decided, not the agent.
+
+Each Claude Desktop session gets its own agent, credit line, policy, and dashboard.
+
+---
+
+## What happens
+
+```
+Agent finds paid service
+    |
+    v
+Paywall returns 402 Payment Required (x402 on Stellar)
+    |
+    v
+AgentPay checks spending policy --- BLOCKED? --> logged, no funds move
+    |
+    v (approved)
+Credit line checked (overcollateralized)
+    |
+    v
+USDC payment settles on Stellar
+    |
+    v
+Service unlocks, spend recorded, dashboard updates
+```
+
+**Approved**: agent requests Capital Insider article -> 402 -> policy + credit check passes -> USDC settles on Stellar -> article unlocks -> spend logged
+
+**Blocked**: agent requests premium-data.io -> policy rejects -> blocked event logged -> purchasing power unchanged -> zero risk
+
+---
+
+## What makes AgentPay different
+
+- **Real on-chain settlement** — not simulated balances. USDC on Stellar, verifiable on-chain.
+- **Policy enforcement before funds move** — blocked payments never touch the treasury. The policy decides, not the agent.
+- **Overcollateralized** — credit lines are backed by real assets. No counterparty risk.
+- **Built for machine decision loops** — thousands of autonomous micro-transactions, not humans clicking "approve."
+- **Agent never holds keys** — AgentPay settles on behalf of the agent. The LLM never sees a private key.
+
+---
+
+## Why this works on Stellar
+
+- **Settlement speed** — agents operate in tight loops. Sub-second finality means the agent doesn't wait.
+- **Fees** — negligible. A $4.99 micropayment is economically viable.
+- **USDC** — pricing is denominated in dollars. Stablecoin-native by design.
+- **x402** — HTTP 402 + Stellar = payment and access compose natively. Every endpoint becomes payable.
+
+---
 
 ## The credit model
 
-The agent's purchasing power is **not** a wallet balance. It is:
+Like a corporate credit card — except programmable and overcollateralized.
 
 ```
-purchasing_power = collateral_value_usd × base_ltv
-available_power  = purchasing_power - used_power
+credit_limit    = collateral_value_usd x LTV
+available       = credit_limit - spent
 ```
 
-- Owner posts **XLM collateral** (10,000 XLM valued at $1,000 in demo)
-- Legasi applies **LTV** (0.6 = conservative discount)
-- Agent gets **600 USDC purchasing power** (credit line, not cash)
-- Payments settle in **USDC on Stellar** — a different asset from the collateral
-- Each settled payment increases `used_power`
-- Blocked/failed payments never affect `used_power`
+Owner posts 10,000 XLM ($1,000) -> LTV 0.6 -> agent gets $600 USDC credit limit. Payments settle in USDC. Blocked payments cost nothing. Owner controls policy in real time from the dashboard.
 
-See [CREDIT_MODEL.md](./CREDIT_MODEL.md) for details.
+Every API becomes a business model once agents can transact. Pay-per-call APIs, dataset marketplaces, premium content, autonomous procurement — the use cases compound as agents become the primary consumers of digital services.
 
-## Quick start
-
-```bash
-pnpm install
-pnpm test            # 58 deterministic tests, no network needed
-pnpm typecheck       # all packages
-
-# Run services locally (mock Stellar submission)
-cp .env.example .env
-# Set STELLAR_PAYEE_ADDRESS to a testnet address
-pnpm dev:orchestrator   # http://localhost:4010
-pnpm dev:paywall        # http://localhost:4020
-```
-
-### Try the API
-
-```bash
-# Check credit account (seeded demo scenario)
-curl http://localhost:4010/account/agent-1
-
-# Make a payment (approved flow)
-curl -X POST http://localhost:4010/payment/request \
-  -H "Content-Type: application/json" \
-  -d '{"agent_id":"agent-1","service_url":"/search","amount_usdc":10}'
-
-# Make a payment (blocked flow)
-curl -X POST http://localhost:4010/payment/request \
-  -H "Content-Type: application/json" \
-  -d '{"agent_id":"agent-1","service_url":"premium-data.io","amount_usdc":10}'
-
-# View payment history
-curl http://localhost:4010/payments/agent-1
-
-# Hit the paywall directly (returns 402 with Stellar challenge)
-curl -i http://localhost:4020/search
-```
-
-## Demo scenario (fixed seed)
-
-| Parameter | Value |
-|-----------|-------|
-| Collateral asset | XLM (10,000 XLM) |
-| Collateral valuation | $1,000 USD |
-| Base LTV | 0.6 |
-| Purchasing power | 600 USDC |
-| Payment asset | USDC (Stellar testnet) |
-| Allowlisted service | `/search` (cap: 100/request, 500/day) |
-| Blocked service | `premium-data.io` (synthetic, not a real service) |
-
-## What is real vs mocked
-
-| Component | Status |
-|-----------|--------|
-| x402 paywall (402 challenge) | **Real** — `@x402/hono` + `@x402/stellar`, USDC on Stellar testnet |
-| x402 USDC settlement | **Real** — end-to-end on Stellar testnet ([proof tx](https://stellar.expert/explorer/testnet/tx/c95f226755d775a1b97dcc38fbb12d38fe6fee2f9e3f50074b78f382b377fa77)) |
-| Policy engine | **Real** — allowlist/denylist, per-request + daily caps |
-| Credit engine | **Real** — overcollateralized credit line (XLM collateral → USDC purchasing power) |
-| Decision engine | **Real** — combines policy + credit, creates attempts + events |
-| Stellar submission | **Mocked** in local dev, **real** in smoke tests + demo |
-| Storage | **In-memory** Maps with seeded demo data |
+---
 
 ## Architecture
 
 ```
-Agent Client
-    │
-    ▼
-Paywall Service (Hono + @x402/hono + @x402/stellar)
-    │  402 Payment Required
-    ▼
-Legasi Orchestrator (Hono)
-    ├── Policy Engine (allowlist, caps)
-    ├── Credit Engine (collateral × LTV, available power)
-    ├── Decision Engine (policy + credit → approve/block)
-    ├── Submission (Stellar tx)
-    └── Store (attempts, events, domain state)
+User -> Claude Desktop -> AgentPay MCP -> Paywall (402)
+                                              |
+                                    Legasi Orchestrator
+                                     |-- Policy Engine
+                                     |-- Credit Engine
+                                     |-- Stellar Settlement
+                                     '-- Audit Trail
 ```
 
-## Repository structure
+**Stack**: TypeScript, Hono, Stellar SDK, x402, Vitest (69 tests), pnpm monorepo
 
-```
-apps/
-  legasi-orchestrator/   credit + policy + decision + routes
-  paywall-service/       x402-protected service on Stellar testnet
-  agent-client/          client that handles 402 flow
-  demo-ui/               owner/agent dashboard (WIP)
-packages/
-  shared-types/          domain types, enums, Zod schemas
-  credit-engine/         collateral valuation, purchasing power
-```
+---
 
-## Tests
+## Local development
 
 ```bash
-pnpm test              # all deterministic tests
-pnpm --filter @agent-credit-rail/credit-engine test
-pnpm --filter @agent-credit-rail/legasi-orchestrator test
-pnpm --filter @agent-credit-rail/paywall-service test
-pnpm --filter @agent-credit-rail/agent-client test
+pnpm install && pnpm test       # 69 deterministic tests, no network needed
+pnpm typecheck                  # strict across all packages
+
+cp .env.example .env            # set STELLAR_PAYEE_ADDRESS
+pnpm dev:orchestrator           # http://localhost:4010
+pnpm dev:paywall                # http://localhost:4020
+pnpm dev:ui                     # http://localhost:4030
 ```
 
-## Env setup for Stellar testnet
+---
 
-1. Create a Stellar testnet account at [Stellar Laboratory](https://laboratory.stellar.org/#account-creator?network=test)
-2. Fund it via friendbot
-3. Set `STELLAR_PAYEE_ADDRESS` in `.env`
-4. For smoke tests, also set `STELLAR_TESTNET_SECRET_KEY`
+## Built during the Stellar Agents x402 Hackathon
 
-## Tech stack
+AgentPay is a programmable credit primitive for AI agents. Built during the [Stellar Agents x402 Hackathon](https://dorahacks.io/hackathon/stellar-agents-x402-stripe-mpp/detail) — first step toward machine-native financial infrastructure.
 
-- **pnpm** workspace monorepo
-- **TypeScript** (strict, ES2022, Bundler resolution)
-- **Hono** for HTTP services
-- **@x402/hono** + **@x402/stellar** for x402 paywall
-- **Vitest** for testing
-- **Zod** for HTTP boundary validation
-
-## Key design decisions
-
-- `PaymentAttempt` = non-terminal intent (created at decision time)
-- `PaymentEvent` = terminal outcome (blocked, failed, or settled)
-- `POST /payment/request` returns a terminal response in one call (no polling)
-- Every payment carries a correlation `attempt_id` across attempt, event, logs, UI
-- Used power only changes after successful Stellar submission
-- Cap semantics are inclusive (`amount <= cap` is allowed)
-- `INSUFFICIENT_POWER` is the single credit rejection in Phase 1
-
-## Non-goals
-
-- Multi-asset collateral, oracle stack, on-chain policy contracts
-- Liquidation engine, dynamic interest accrual
-- Production custody, mainnet deployment
-- MPP Session mode
+Works with Claude today. Extensible to any agent framework.
