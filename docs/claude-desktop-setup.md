@@ -1,14 +1,13 @@
-# Try Agent Credit Rail with Claude Desktop
+# Try AgentPay with Claude Desktop
 
-Agent Credit Rail lets AI agents spend against an overcollateralized credit line on Stellar. The agent never receives unrestricted funds — Legasi checks policy, verifies credit, and settles USDC payments on the agent's behalf.
+AgentPay gives AI agents their own corporate credit card — backed by real collateral, controlled by policy, settled on Stellar.
 
 ## Live demo links
 
 | Service | URL |
 |---------|-----|
-| Dashboard | https://legasi-dashboard-production.up.railway.app |
-| Orchestrator API | https://legasi-orchestrator-production.up.railway.app/health |
-| Paywall (402) | https://capital-insider-production.up.railway.app/article |
+| Capital Insider (paywalled publication) | https://capital-insider-production.up.railway.app |
+| AgentPay Dashboard | https://legasi-dashboard-production.up.railway.app |
 
 ## Setup (1 minute)
 
@@ -30,51 +29,60 @@ Copy-paste this — nothing to change:
 }
 ```
 
-Restart Claude Desktop (Cmd+Q / Alt+F4, then relaunch). You should see the hammer icon (🔨) with 5 tools available.
+Restart Claude Desktop (Cmd+Q / Alt+F4, then relaunch). You should see the hammer icon with 5 tools available.
 
 ## Demo script
 
-Try these prompts in order:
+### 1. Discover the paywalled article
 
-### 1. Set up your Legasi profile
-> Set up Legasi for me. My name is [your name].
+First, visit https://capital-insider-production.up.railway.app — you'll see a premium financial publication. Click on the featured article. Try the "Pay $4.99" button — it asks for a credit card or wallet. Close it.
 
-You get a fresh agent with a **600 USDC credit line** backed by 10,000 XLM demo collateral, and a personal dashboard link.
+Now ask Claude:
 
-### 2. Check your policy
-> Show my policy.
+> Is there any news about Legasi on capital-insider-production.up.railway.app?
 
-### 3. Read a premium article (approved flow)
-> Read the premium article.
+Claude finds the article but can't read the full content — it's paywalled.
 
-Watch the payment settle in real time on Stellar testnet. Click the Stellar Explorer link to verify the on-chain USDC transfer.
+### 2. Ask Claude to pay for it
 
-### 4. Check your payment history
-> Show my payment history.
+> Can you pay for it?
 
-### 5. Test policy enforcement (blocked flow)
+Claude uses AgentPay to pay $0.001 USDC on Stellar testnet and unlocks the full article. Click the **Stellar Explorer** link to see the real on-chain transaction.
 
-Open your dashboard link, click **Edit** on Policy Rules, toggle `/article` to **DENIED**, save. Then:
+### 3. Check your dashboard
+
+> Show me my dashboard.
+
+Open the link — you'll see the payment in the **Transaction Feed**, the credit card with remaining balance, and the spending policy.
+
+### 4. Test policy enforcement (blocked flow)
+
+> Can you access unknown-api.xyz for me?
+
+The payment is **blocked** — unknown-api.xyz is not allowlisted. AgentPay never lets the agent spend outside its policy.
+
+### 5. Edit the policy live
+
+Open your dashboard, click **Edit** on Spending Policy, toggle `/article` to **DENIED**, save. Then:
 
 > Read the premium article again.
 
-The payment will be **blocked** by policy. Toggle it back to ALLOWED to restore access.
+Blocked! The owner controls where the agent can spend, in real time.
 
 ## What to observe
 
-After each prompt, open your personal dashboard link and watch:
-
-- **Payment History** — settled (green) or blocked (red) events appear in real time
-- **Policy Rules** — per-request and daily caps
-- **Power Bar** — available credit decreases after each settled payment
-- **Stellar Explorer** — click any tx hash to see the real USDC settlement on Stellar testnet
+- **Payment settled on Stellar** — real USDC transaction on testnet, verifiable on Stellar Explorer
+- **Policy enforcement** — blocked payments never move money, only approved ones settle
+- **Dashboard updates live** — transaction feed, credit utilization, policy rules
+- **No wallet needed** — the AI agent pays through its credit line, not a connected wallet
+- **Owner controls everything** — spending rules, caps, and allowlists are editable in real time
 
 ## How it works
 
 ```
-Claude Desktop → MCP tool → Paywall (402) → Legasi Orchestrator → Stellar USDC settlement
-                                                    ↓
-                                            Policy check + Credit check
+User → Claude Desktop → AgentPay MCP → Paywall (402) → Legasi Orchestrator → Stellar USDC settlement
+                                                              ↓
+                                                      Policy check + Credit check
 ```
 
-The agent never touches funds. Legasi settles on its behalf, against an overcollateralized credit line backed by the owner's XLM collateral. Each Claude Desktop session gets its own agent identity, policy, and payment history.
+The agent never touches funds. AgentPay settles on its behalf, against an overcollateralized credit line backed by the owner's XLM collateral. Each Claude Desktop session gets its own agent identity, policy, and payment history.
