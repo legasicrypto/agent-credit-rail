@@ -397,7 +397,20 @@ const HOMEPAGE_HTML = `<!DOCTYPE html>
         <p>The programmable credit infrastructure company combines DeFi rate optimization with traditional wealth management in its boldest move yet.</p>
         <a href="/article/legasi-morpho-montaigne" class="read-more">Read article &rarr;</a>
       </div>
-      <div class="visual">CI</div>
+      <div class="visual">
+        <svg viewBox="0 0 280 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;padding:24px;">
+          <rect x="20" y="160" width="28" height="30" rx="4" fill="#ddd"/>
+          <rect x="56" y="130" width="28" height="60" rx="4" fill="#ccc"/>
+          <rect x="92" y="110" width="28" height="80" rx="4" fill="#bbb"/>
+          <rect x="128" y="80" width="28" height="110" rx="4" fill="#aaa"/>
+          <rect x="164" y="55" width="28" height="135" rx="4" fill="#999"/>
+          <rect x="200" y="30" width="28" height="160" rx="4" fill="#777"/>
+          <rect x="236" y="10" width="28" height="180" rx="4" fill="#555"/>
+          <line x1="16" y1="190" x2="268" y2="190" stroke="#ddd" stroke-width="1"/>
+          <path d="M 34 155 Q 90 120 142 95 T 250 25" stroke="#c0392b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <circle cx="250" cy="25" r="4" fill="#c0392b"/>
+        </svg>
+      </div>
     </div>
   </div>
 
