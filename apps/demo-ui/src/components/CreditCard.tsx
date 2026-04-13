@@ -33,7 +33,7 @@ export function CreditCard({
         <div className="relative flex flex-col justify-between h-full">
           {/* Top row */}
           <div className="flex justify-between items-start">
-            <span className="text-sm font-bold tracking-widest uppercase opacity-90">Legasi</span>
+            <img src="/legasi-logo-white.svg" alt="Legasi" className="h-5 opacity-90" />
             <StellarBadge className="!text-white/70" />
           </div>
 

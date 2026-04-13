@@ -1,14 +1,15 @@
 export function HeroBanner() {
   return (
     <section className="text-center py-12 px-4 animate-fade-in">
-      <h1 className="text-5xl font-extrabold tracking-tight mb-2">
-        <span className="bg-gradient-to-r from-brand-blue to-brand-purple bg-clip-text text-transparent">
-          Legasi
-        </span>
-      </h1>
-      <p className="text-xl font-semibold text-gray-700 mb-3">
+      <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-3">
         Corporate Credit Cards for AI Agents
-      </p>
+      </h1>
+      <div className="flex items-center justify-center gap-2 mb-6">
+        <span className="text-lg text-gray-500">by</span>
+        <a href="https://legasi.io" target="_blank" rel="noopener noreferrer" className="inline-flex items-center">
+          <img src="/legasi-logo.svg" alt="Legasi" className="h-6" />
+        </a>
+      </div>
       <p className="text-gray-500 max-w-xl mx-auto mb-10">
         Post collateral. Set spending rules. Let your agents pay autonomously
         &mdash; every transaction settled on Stellar.
