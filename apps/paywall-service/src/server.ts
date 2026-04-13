@@ -17,7 +17,7 @@ export const USDC_TESTNET_ASSET = "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3U
 const defaults = {
   stellarNetwork: "stellar:testnet" as `${string}:${string}`,
   facilitatorUrl: "https://x402.org/facilitator",
-  price: { amount: "10000", asset: USDC_TESTNET_ASSET } as
+  price: { amount: "49900000", asset: USDC_TESTNET_ASSET } as
     | string
     | { amount: string; asset: string },
 };

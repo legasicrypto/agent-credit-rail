@@ -35,7 +35,7 @@ export function LiveDemo({ allowedRules, agentId, paywallUrl, apiUrl, onRefresh 
             <button
               key={`pay-${rule.service_url}`}
               onClick={() =>
-                setActiveStepper({ serviceUrl: rule.service_url, amount: 10 })
+                setActiveStepper({ serviceUrl: rule.service_url, amount: 4.99 })
               }
               className="group relative px-5 py-3 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:border-brand-blue/40 transition-all cursor-pointer"
             >
@@ -43,7 +43,7 @@ export function LiveDemo({ allowedRules, agentId, paywallUrl, apiUrl, onRefresh 
                 Read premium article
               </div>
               <div className="text-xs text-gray-400 mt-0.5">
-                {rule.service_url} &middot; 10 USDC on Stellar
+                {rule.service_url} &middot; $4.99 USDC on Stellar
               </div>
             </button>
           ))}
