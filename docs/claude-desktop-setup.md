@@ -47,7 +47,7 @@ Claude finds the article but can't read the full content — it's paywalled.
 
 > Can you pay for it?
 
-Claude uses AgentPay to pay $0.001 USDC on Stellar testnet and unlocks the full article. Click the **Stellar Explorer** link to see the real on-chain transaction.
+Claude uses AgentPay to pay $4.99 in USDC on Stellar testnet and unlocks the full article. Click the **Stellar Explorer** link to see the real on-chain transaction.
 
 ### 3. Check your dashboard
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-Agent Credit Rail is Legasi's hackathon MVP for policy-controlled agent payments on Stellar testnet. The core model: an owner posts collateral, Legasi computes an overcollateralized credit line (collateral × LTV), and agents spend against that credit line for approved x402 services only. Think "corporate credit card for AI agents" — the agent never receives unrestricted funds.
+AgentPay (repo name: agent-credit-rail) is Legasi's hackathon MVP — a corporate payment stack for AI agents on Stellar testnet. The core model: an owner posts collateral, Legasi computes an overcollateralized credit line (collateral x LTV), and agents spend against that credit line for approved x402 services only. Think Spendesk for AI agents — the agent never receives unrestricted funds.
 
 ## Build and development commands
 
@@ -44,7 +44,7 @@ This is a pnpm workspace monorepo. Workspaces are declared in `pnpm-workspace.ya
 - `paywall-service` — x402-protected demo service (returns 402, unlocks after settlement)
 - `demo-ui` — React/Vite dashboard: agent selector, credit account display, inline policy editing (`PUT /policy/:agentId`), payment actions, payment history with Stellar Explorer links. Supports `?agentId=` deep linking for MCP provisioning flow.
 - `agent-client` — CLI or MCP-style client that requests services and authorizes payments
-- `mcp-server` — 5-tool MCP server (stdio transport) for Claude Desktop; exposes `setup_legasi`, `get_dashboard_link`, `show_my_policy`, `read_premium_article`, `show_my_payments`. Each Claude Desktop session auto-provisions its own agent via `POST /provision` on first tool use.
+- `mcp-server` — 6-tool MCP server (stdio transport) for Claude Desktop; exposes `setup_legasi`, `get_dashboard_link`, `show_my_policy`, `read_premium_article`, `pay_for_service`, `show_my_payments`. Each Claude Desktop session auto-provisions its own agent via `POST /provision` on first tool use. Auto-reprovisions if orchestrator redeploys.
 
 **Packages** (`packages/`):
 - `credit-engine` — collateral valuation, LTV computation, purchasing power logic
@@ -58,7 +58,7 @@ Defined in `.env.example` at repo root:
 - `STELLAR_TESTNET_SECRET_KEY` — optional; when unset, orchestrator uses a **mock settler** returning fake tx hashes (useful for local dev without testnet funds)
 - `STELLAR_PAYEE_ADDRESS` — paywall's Stellar testnet address
 - `STELLAR_NETWORK`, `FACILITATOR_URL` — x402 settlement config
-- `PAYWALL_PORT` (4020), `ORCHESTRATOR_PORT` (4010), `PAYWALL_PRICE` ($0.001)
+- `PAYWALL_PORT` (4020), `ORCHESTRATOR_PORT` (4010), `PAYWALL_PRICE` ($4.99 default)
 - `ORCHESTRATOR_URL`, `PAYWALL_URL` — used by MCP server (default to Railway production URLs)
 - `VITE_API_URL` — demo-ui build arg for API endpoint (build-time coupled to orchestrator URL)
 - `DASHBOARD_URL` — used by MCP server and `/provision` route (defaults to Railway dashboard URL)
@@ -77,7 +77,7 @@ Three apps deploy to **Railway** (project: `generous-curiosity`). In-memory stat
 | Service | URL | Port | Dockerfile | Key env vars |
 |---|---|---|---|---|
 | `legasi-orchestrator` | `legasi-orchestrator-production.up.railway.app` | 4010 | Root `Dockerfile` (`APP_ENTRYPOINT=apps/legasi-orchestrator/src/main.ts`) | `ORCHESTRATOR_PORT`, `DASHBOARD_URL`, `STELLAR_TESTNET_SECRET_KEY` (optional) |
-| `legasi-paywall` | `legasi-paywall-production.up.railway.app` | 4020 | Root `Dockerfile` (`APP_ENTRYPOINT=apps/paywall-service/src/main.ts`) | `PAYWALL_PORT`, `STELLAR_PAYEE_ADDRESS`, `STELLAR_NETWORK`, `FACILITATOR_URL` |
+| `capital-insider` | `capital-insider-production.up.railway.app` | 4020 | Root `Dockerfile` (`APP_ENTRYPOINT=apps/paywall-service/src/main.ts`) | `PAYWALL_PORT`, `STELLAR_PAYEE_ADDRESS`, `STELLAR_NETWORK`, `FACILITATOR_URL` |
 | `legasi-dashboard` | `legasi-dashboard-production.up.railway.app` | 4030 | `apps/demo-ui/Dockerfile` (`RAILWAY_DOCKERFILE_PATH`) | `VITE_API_URL` (build-time, points to orchestrator URL) |
 
 Shared `Dockerfile` at repo root (node:22-slim + pnpm + tsx) for orchestrator and paywall. Separate Dockerfile in `apps/demo-ui/` (Vite build + serve).

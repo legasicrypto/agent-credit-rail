@@ -4,7 +4,7 @@
 
 Show one complete story that judges can understand immediately:
 
-An owner funds an overcollateralized credit line for an agent, the agent tries to buy from an approved x402 service, Legasi approves and submits the payment on Stellar testnet, and the service returns the protected result.
+An owner funds an overcollateralized credit line for an agent, the agent tries to buy from an approved x402 service, AgentPay approves and submits the payment on Stellar testnet, and the service returns the protected result.
 
 ## Primary demo sequence
 
@@ -17,15 +17,15 @@ An owner funds an overcollateralized credit line for an agent, the agent tries t
 4. Show the agent's allowlisted service.
 5. Call the paid service.
 6. Show `402 Payment Required`.
-7. Show Legasi policy approval.
+7. Show AgentPay policy approval.
 8. Show the agent authorizing the payment intent.
-9. Show Legasi submitting the Stellar transaction.
+9. Show AgentPay submitting the Stellar transaction.
 10. Show the paid result returned.
 11. Show updated remaining purchasing power and payment log.
 
 ## Secondary demo sequence
 
-1. Call a non-allowlisted service.
+1. Call a non-allowlisted service (premium-data.io).
 2. Show that the payment is blocked.
 3. Show the blocked-attempt log.
 4. Optionally show an owner notification.
@@ -34,15 +34,15 @@ An owner funds an overcollateralized credit line for an agent, the agent tries t
 
 ### Opening
 
-"This is a corporate credit card model for agents. The owner posts collateral, Legasi converts that collateral into an overcollateralized credit line, and the owner defines where the agent is allowed to spend. The agent can buy approved services, but it does not control the treasury account."
+"This is a corporate payment stack for AI agents. The owner posts collateral, AgentPay converts that collateral into an overcollateralized credit line, and the owner defines where the agent is allowed to spend. The agent can buy approved services, but it does not control the treasury account."
 
 ### Approved spend
 
-"Here the owner has posted collateral worth 1,000 USD. With a 60% LTV, Legasi gives the agent 600 USDC of purchasing power. The agent requests a paid service. The service responds with 402 Payment Required. Legasi checks the policy and remaining headroom, the agent authorizes the payment intent, and Legasi submits the transaction on Stellar testnet. Once settlement succeeds, the service unlocks."
+"Here the owner has posted collateral worth 1,000 USD. With a 60% LTV, AgentPay gives the agent 600 USDC of purchasing power. The agent requests a paid article on Capital Insider. The service responds with 402 Payment Required. AgentPay checks the policy and remaining headroom, the agent authorizes the payment intent, and AgentPay submits the transaction on Stellar testnet. Once settlement succeeds, the article unlocks."
 
 ### Blocked spend
 
-"Now the same agent attempts to buy from a non-approved service. This time the request is blocked before settlement because the target service is not allowlisted. Legasi logs the blocked attempt and can notify the owner."
+"Now the same agent attempts to buy data from premium-data.io. This time the request is blocked before settlement because the target service is not allowlisted. AgentPay logs the blocked attempt and can notify the owner."
 
 ## Evidence to capture
 
