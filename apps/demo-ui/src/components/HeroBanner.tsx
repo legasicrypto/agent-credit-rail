@@ -8,13 +8,15 @@ export function HeroBanner() {
         <div className="absolute top-[30%] right-[30%] w-40 h-40 rounded-full bg-gray-200/40 blur-[50px]" />
       </div>
 
-      <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 leading-tight mb-4">
-        Corporate Credit Cards
-        <br />
+      <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 leading-tight mb-3">
         <span className="bg-gradient-to-r from-brand-blue to-brand-purple bg-clip-text text-transparent">
-          for AI Agents
+          AgentPay
         </span>
       </h1>
+
+      <p className="text-xl md:text-2xl font-semibold text-gray-700 mb-2">
+        Corporate Credit Cards for AI Agents
+      </p>
 
       <div className="flex items-center justify-center gap-2.5 mb-8">
         <span className="text-base text-gray-400 font-medium">by</span>
