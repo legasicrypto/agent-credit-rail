@@ -28,8 +28,16 @@ interface ProvisionResult {
 }
 
 async function ensureProvisioned(displayName?: string): Promise<ProvisionResult> {
+  // If we have a cached session, verify the agent still exists on the orchestrator
   if (sessionAgentId && sessionAgentName && sessionDashboardUrl) {
-    return { agent_id: sessionAgentId, agent_name: sessionAgentName, dashboard_url: sessionDashboardUrl };
+    const check = await fetch(`${ORCHESTRATOR_URL}/account/${sessionAgentId}`);
+    if (check.ok) {
+      return { agent_id: sessionAgentId, agent_name: sessionAgentName, dashboard_url: sessionDashboardUrl };
+    }
+    // Agent gone (orchestrator redeployed) — re-provision
+    sessionAgentId = null;
+    sessionAgentName = null;
+    sessionDashboardUrl = null;
   }
 
   const res = await fetch(`${ORCHESTRATOR_URL}/provision`, {
@@ -49,7 +57,7 @@ async function ensureProvisioned(displayName?: string): Promise<ProvisionResult>
 
 const server = new McpServer({
   name: "legasi-credit-rail",
-  version: "0.2.0",
+  version: "0.4.0",
 });
 
 // ── Tool 1: setup_legasi ──
