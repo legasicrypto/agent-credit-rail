@@ -135,6 +135,59 @@ const ARTICLE_PAGE_HTML = `<!DOCTYPE html>
       max-width: 400px; margin: 0 auto; line-height: 1.5;
     }
     .paywall-sub a { color: #555; text-decoration: underline; }
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      z-index: 100; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: white; border-radius: 16px; padding: 32px; width: 400px; max-width: 90vw;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.15); font-family: 'Inter', sans-serif;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px; background: none; border: none;
+      font-size: 18px; color: #999; cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { color: #333; }
+    .modal h3 { font-size: 18px; font-weight: 700; color: #111; margin-bottom: 4px; }
+    .modal .price-line { font-size: 14px; color: #888; margin-bottom: 24px; }
+    .modal .tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 1px solid #e5e5e0; }
+    .modal .tab {
+      flex: 1; padding: 10px 0; text-align: center; font-size: 13px; font-weight: 600;
+      color: #999; border-bottom: 2px solid transparent; cursor: pointer; background: none; border-top: none; border-left: none; border-right: none;
+    }
+    .modal .tab.active { color: #111; border-bottom-color: #111; }
+    .modal .tab:hover:not(.active) { color: #555; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; font-weight: 600; color: #888; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field input {
+      width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px;
+      font-size: 14px; font-family: 'Inter', sans-serif; color: #333; background: #fafaf8;
+      outline: none; box-sizing: border-box;
+    }
+    .field input:focus { border-color: #999; }
+    .field input::placeholder { color: #ccc; }
+    .row-fields { display: flex; gap: 12px; }
+    .row-fields .field { flex: 1; }
+    .submit-btn {
+      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600; color: white; background: #111;
+      cursor: pointer; font-family: 'Inter', sans-serif; margin-top: 8px;
+    }
+    .submit-btn:hover { background: #333; }
+    .wallet-option {
+      display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+      border: 1px solid #e5e5e0; border-radius: 10px; cursor: pointer;
+      margin-bottom: 10px; transition: border-color 0.15s;
+    }
+    .wallet-option:hover { border-color: #999; }
+    .wallet-icon { width: 32px; height: 32px; border-radius: 8px; background: #f0f0ec; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .wallet-name { font-size: 14px; font-weight: 600; color: #111; }
+    .wallet-desc { font-size: 12px; color: #999; }
   </style>
 </head>
 <body>
@@ -174,7 +227,7 @@ const ARTICLE_PAGE_HTML = `<!DOCTYPE html>
     </div>
 
     <div class="paywall-overlay">
-      <button class="pay-btn" onclick="alert('Payment requires an x402-compatible agent. Try asking your AI assistant to read this article.')">
+      <button class="pay-btn" onclick="document.getElementById('pay-modal').classList.add('open')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         Pay $4.99 to read
       </button>
@@ -183,6 +236,65 @@ const ARTICLE_PAGE_HTML = `<!DOCTYPE html>
       </p>
     </div>
   </article>
+
+  <div id="pay-modal" class="modal-backdrop" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal">
+      <button class="modal-close" onclick="document.getElementById('pay-modal').classList.remove('open')">&times;</button>
+      <h3>Unlock this article</h3>
+      <div class="price-line">One-time payment &mdash; $4.99</div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('card',this)">Card</button>
+        <button class="tab" onclick="switchTab('wallet',this)">Wallet</button>
+      </div>
+
+      <div id="tab-card" class="tab-content active">
+        <div class="field">
+          <label>Card number</label>
+          <input type="text" placeholder="1234 5678 9012 3456" maxlength="19">
+        </div>
+        <div class="row-fields">
+          <div class="field">
+            <label>Expiry</label>
+            <input type="text" placeholder="MM / YY" maxlength="7">
+          </div>
+          <div class="field">
+            <label>CVC</label>
+            <input type="text" placeholder="123" maxlength="4">
+          </div>
+        </div>
+        <div class="field">
+          <label>Name on card</label>
+          <input type="text" placeholder="J. Smith">
+        </div>
+        <button class="submit-btn" onclick="document.getElementById('pay-modal').classList.remove('open');alert('Payment failed. Try asking your AI agent to read this article instead.')">Pay $4.99</button>
+      </div>
+
+      <div id="tab-wallet" class="tab-content">
+        <div class="wallet-option" onclick="document.getElementById('pay-modal').classList.remove('open');alert('Wallet connection failed. Try asking your AI agent to read this article instead.')">
+          <div class="wallet-icon">&#9670;</div>
+          <div><div class="wallet-name">MetaMask</div><div class="wallet-desc">Connect your browser wallet</div></div>
+        </div>
+        <div class="wallet-option" onclick="document.getElementById('pay-modal').classList.remove('open');alert('Wallet connection failed. Try asking your AI agent to read this article instead.')">
+          <div class="wallet-icon">&#9679;</div>
+          <div><div class="wallet-name">Freighter</div><div class="wallet-desc">Stellar wallet</div></div>
+        </div>
+        <div class="wallet-option" onclick="document.getElementById('pay-modal').classList.remove('open');alert('Wallet connection failed. Try asking your AI agent to read this article instead.')">
+          <div class="wallet-icon">&#8857;</div>
+          <div><div class="wallet-name">WalletConnect</div><div class="wallet-desc">Scan QR code</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(name, el) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+  </script>
 </body>
 </html>`;
 
