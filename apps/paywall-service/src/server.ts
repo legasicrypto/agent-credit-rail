@@ -41,6 +41,10 @@ export function createPaywallApp(config: PaywallConfig) {
   app.get("/health", (c) => c.json({ status: "ok" }));
 
   app.get("/", (c) => {
+    return c.html(HOMEPAGE_HTML);
+  });
+
+  app.get("/article/legasi-morpho-montaigne", (c) => {
     return c.html(ARTICLE_PAGE_HTML);
   });
 
@@ -136,7 +140,7 @@ const ARTICLE_PAGE_HTML = `<!DOCTYPE html>
 <body>
   <div class="header">
     <div class="header-inner">
-      <div class="brand">Capital Insider</div>
+      <a href="/" class="brand" style="text-decoration:none;color:#888;">Capital Insider</a>
       <div class="nav-tag">Premium Intelligence &middot; Finance &middot; AI &middot; Markets</div>
     </div>
   </div>
@@ -182,3 +186,140 @@ const ARTICLE_PAGE_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
+const HOMEPAGE_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capital Insider — Premium Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #fafaf8; color: #1a1a1a; }
+    a { text-decoration: none; color: inherit; }
+    .header { border-bottom: 1px solid #e5e5e0; padding: 24px 0; }
+    .header-inner { max-width: 960px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 14px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #111; }
+    .nav { display: flex; gap: 24px; font-size: 13px; color: #888; font-weight: 500; }
+    .nav a:hover { color: #111; }
+    .subscribe-btn {
+      font-size: 12px; font-weight: 600; color: white; background: #111;
+      padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer;
+    }
+    .hero { max-width: 960px; margin: 0 auto; padding: 64px 24px 48px; text-align: center; }
+    .hero h1 { font-family: 'Lora', Georgia, serif; font-size: 18px; font-weight: 400; color: #888; margin-bottom: 8px; }
+    .hero h2 { font-family: 'Lora', Georgia, serif; font-size: 42px; font-weight: 600; line-height: 1.2; color: #111; max-width: 640px; margin: 0 auto 16px; }
+    .hero p { font-size: 15px; color: #999; max-width: 500px; margin: 0 auto; }
+    .divider { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    .divider hr { border: none; border-top: 1px solid #e5e5e0; }
+    .grid { max-width: 960px; margin: 0 auto; padding: 48px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+    .card { display: flex; flex-direction: column; gap: 12px; }
+    .card-tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; }
+    .card h3 { font-family: 'Lora', Georgia, serif; font-size: 22px; font-weight: 600; line-height: 1.3; color: #111; }
+    .card h3 a:hover { color: #555; }
+    .card p { font-size: 14px; color: #777; line-height: 1.5; }
+    .card-meta { font-size: 12px; color: #bbb; display: flex; align-items: center; gap: 8px; }
+    .card-meta .badge {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+      color: #888; background: #f0f0ec; padding: 3px 8px; border-radius: 4px;
+    }
+    .featured {
+      max-width: 960px; margin: 0 auto; padding: 0 24px 48px;
+    }
+    .featured-card {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+      background: white; border: 1px solid #e5e5e0; border-radius: 12px; padding: 40px;
+    }
+    @media (max-width: 640px) { .featured-card { grid-template-columns: 1fr; padding: 24px; } }
+    .featured-card .text-side { }
+    .featured-card .tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #c0392b; margin-bottom: 12px; }
+    .featured-card h3 { font-family: 'Lora', Georgia, serif; font-size: 28px; font-weight: 600; line-height: 1.3; color: #111; margin-bottom: 12px; }
+    .featured-card h3 a:hover { color: #555; }
+    .featured-card p { font-size: 15px; color: #666; line-height: 1.6; margin-bottom: 16px; }
+    .featured-card .read-more { font-size: 13px; font-weight: 600; color: #111; }
+    .featured-card .read-more:hover { text-decoration: underline; }
+    .featured-card .visual {
+      background: #f5f5f0; border-radius: 8px; height: 240px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', Georgia, serif; font-size: 48px; color: #ddd;
+    }
+    .section-label {
+      max-width: 960px; margin: 0 auto; padding: 0 24px 24px;
+      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #bbb;
+    }
+    .footer {
+      border-top: 1px solid #e5e5e0; padding: 32px 0; text-align: center;
+      font-size: 12px; color: #bbb; margin-top: 48px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-inner">
+      <div class="logo">Capital Insider</div>
+      <div class="nav">
+        <a href="#">Markets</a>
+        <a href="#">Finance</a>
+        <a href="#">AI</a>
+        <a href="#">Deals</a>
+      </div>
+      <button class="subscribe-btn">Subscribe</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1>Premium Intelligence</h1>
+    <h2>The deals, strategies, and signals that move markets</h2>
+    <p>Exclusive reporting on finance, AI, and institutional infrastructure.</p>
+  </div>
+
+  <div class="divider"><hr></div>
+
+  <div class="featured" style="padding-top: 48px;">
+    <div class="featured-card">
+      <div class="text-side">
+        <div class="tag">Exclusive</div>
+        <h3><a href="/article/legasi-morpho-montaigne">Legasi closes acquisition of Morpho and Montaigne Conseil &amp; Patrimoine in landmark $380M deal</a></h3>
+        <p>The programmable credit infrastructure company combines DeFi rate optimization with traditional wealth management in its boldest move yet.</p>
+        <a href="/article/legasi-morpho-montaigne" class="read-more">Read article &rarr;</a>
+      </div>
+      <div class="visual">CI</div>
+    </div>
+  </div>
+
+  <div class="section-label">Latest</div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-tag">AI Infrastructure</div>
+      <h3><a href="#">Why autonomous agents need their own payment rails</a></h3>
+      <p>The $200B bottleneck: AI agents can reason, code, and browse — but they can't pay for anything. A new generation of infrastructure is fixing that.</p>
+      <div class="card-meta">Apr 8, 2026 <span class="badge">Premium</span></div>
+    </div>
+    <div class="card">
+      <div class="card-tag">Regulation</div>
+      <h3><a href="#">EU MiCA framework opens door for programmable credit on-chain</a></h3>
+      <p>New regulatory clarity in Europe is enabling licensed institutions to issue policy-controlled credit lines backed by tokenized collateral.</p>
+      <div class="card-meta">Apr 6, 2026 <span class="badge">Premium</span></div>
+    </div>
+    <div class="card">
+      <div class="card-tag">Deals</div>
+      <h3><a href="#">SG-FORGE expands digital asset custody to six new EU banks</a></h3>
+      <p>Societe Generale's blockchain arm signs six new banking partners, signaling accelerating institutional adoption of on-chain infrastructure.</p>
+      <div class="card-meta">Apr 4, 2026 <span class="badge">Premium</span></div>
+    </div>
+    <div class="card">
+      <div class="card-tag">Markets</div>
+      <h3><a href="#">Stellar network volume hits $2.4B as micropayment use cases surge</a></h3>
+      <p>Machine-to-machine transactions now account for 18% of Stellar testnet volume, driven by x402 protocol adoption.</p>
+      <div class="card-meta">Apr 2, 2026 <span class="badge">Premium</span></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    &copy; 2026 Capital Insider. All rights reserved. Premium intelligence for institutional readers.
+  </div>
+</body>
+</html>`;
